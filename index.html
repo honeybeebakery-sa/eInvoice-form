@@ -422,75 +422,77 @@ formatDigitsOnly(document.getElementById("postcode"));
   statusBar.style.display = "none";
   form.parentNode.appendChild(statusBar);
 
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
+form.addEventListener("submit", function(e){
+  e.preventDefault();
 
-    const formData = Object.fromEntries(new FormData(form).entries());
+  const formData = Object.fromEntries(new FormData(form).entries());
 
+  statusBar.innerHTML = "";
+
+  const submittingMsg = document.createElement("div");
+  submittingMsg.textContent = "⏳ Submitting...";
+  submittingMsg.style.background = "#cce5ff";
+  submittingMsg.style.color = "#004085";
+  submittingMsg.style.fontSize = "18px";
+  submittingMsg.style.fontFamily = "Arial, sans-serif";
+  submittingMsg.style.fontWeight = "bold";
+  submittingMsg.style.padding = "12px";
+  submittingMsg.style.marginBottom = "10px";
+  submittingMsg.style.border = "1px solid #004085";
+  submittingMsg.style.borderRadius = "6px";
+  submittingMsg.style.textAlign = "center";
+
+  statusBar.appendChild(submittingMsg);
+  statusBar.style.display = "block";
+
+  fetch(scriptURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }, // <-- Add this
+    body: JSON.stringify(formData)
+  })
+  .then(res => res.json())
+  .then(data => {
     statusBar.innerHTML = "";
+    const msg = document.createElement("div");
 
-    const submittingMsg = document.createElement("div");
-    submittingMsg.textContent = "⏳ Submitting...";
-    submittingMsg.style.background = "#cce5ff";
-    submittingMsg.style.color = "#004085";
-    submittingMsg.style.fontSize = "18px";
-    submittingMsg.style.fontFamily = "Arial, sans-serif";
-    submittingMsg.style.fontWeight = "bold";
-    submittingMsg.style.padding = "12px";
-    submittingMsg.style.marginBottom = "10px";
-    submittingMsg.style.border = "1px solid #004085";
-    submittingMsg.style.borderRadius = "6px";
-    submittingMsg.style.textAlign = "center";
+    if (data.status === "success") {
+      msg.textContent = "✅ Submission successful!";
+      msg.style.background = "#d4edda";
+      msg.style.color = "#155724";
+      form.reset();
+    } else {
+      msg.textContent = "❌ Submission failed: " + (data.message || "");
+      msg.style.background = "#f8d7da";
+      msg.style.color = "#721c24";
+    }
 
-    statusBar.appendChild(submittingMsg);
-    statusBar.style.display = "block";
+    msg.style.fontSize = "18px";
+    msg.style.fontFamily = "Arial, sans-serif";
+    msg.style.fontWeight = "bold";
+    msg.style.padding = "12px";
+    msg.style.marginBottom = "10px";
+    msg.style.border = "1px solid currentColor";
+    msg.style.borderRadius = "6px";
+    msg.style.textAlign = "center";
 
-    fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
-      .then(res => res.json())
-      .then(data => {
-        statusBar.innerHTML = "";
-        const msg = document.createElement("div");
+    statusBar.appendChild(msg);
+  })
+  .catch(err => {
+    statusBar.innerHTML = "";
+    const msg = document.createElement("div");
+    msg.textContent = "❌ Submission failed: " + err;
+    msg.style.background = "#f8d7da";
+    msg.style.color = "#721c24";
+    msg.style.fontSize = "18px";
+    msg.style.fontFamily = "Arial, sans-serif";
+    msg.style.fontWeight = "bold";
+    msg.style.padding = "12px";
+    msg.style.marginBottom = "10px";
+    msg.style.border = "1px solid #721c24";
+    msg.style.borderRadius = "6px";
+    msg.style.textAlign = "center";
 
-        if (data.status === "success") {
-          msg.textContent = "✅ Submission successful!";
-          msg.style.background = "#d4edda";
-          msg.style.color = "#155724";
-          form.reset();
-        } else {
-          msg.textContent = "❌ Submission failed: " + (data.message || "");
-          msg.style.background = "#f8d7da";
-          msg.style.color = "#721c24";
-        }
-
-        msg.style.fontSize = "18px";
-        msg.style.fontFamily = "Arial, sans-serif";
-        msg.style.fontWeight = "bold";
-        msg.style.padding = "12px";
-        msg.style.marginBottom = "10px";
-        msg.style.border = "1px solid currentColor";
-        msg.style.borderRadius = "6px";
-        msg.style.textAlign = "center";
-
-        statusBar.appendChild(msg);
-      })
-      .catch(err => {
-        statusBar.innerHTML = "";
-        const msg = document.createElement("div");
-        msg.textContent = "❌ Submission failed: " + err;
-        msg.style.background = "#f8d7da";
-        msg.style.color = "#721c24";
-        msg.style.fontSize = "18px";
-        msg.style.fontFamily = "Arial, sans-serif";
-        msg.style.fontWeight = "bold";
-        msg.style.padding = "12px";
-        msg.style.marginBottom = "10px";
-        msg.style.border = "1px solid #721c24";
-        msg.style.borderRadius = "6px";
-        msg.style.textAlign = "center";
-
-        statusBar.appendChild(msg);
-      });
+    statusBar.appendChild(msg);
   });
-};
+});
 </script>
-
