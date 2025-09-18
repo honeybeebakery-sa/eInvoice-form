@@ -152,7 +152,7 @@
 </form>
 
 <script>
-window.onload = function() {
+window.onload = function () {
   // --- Helper function for status/warning messages ---
   function showMessage(text, bgColor, textColor) {
     const msg = document.createElement("div");
@@ -163,7 +163,8 @@ window.onload = function() {
     msg.style.marginTop = "15px";
     msg.style.borderRadius = "8px";
     msg.style.fontWeight = "bold";
-    msg.style.fontSize = "14px";
+    msg.style.fontSize = "18px"; // bigger
+    msg.style.fontFamily = "Arial, sans-serif";
     msg.style.textAlign = "center";
     msg.style.maxWidth = "600px";
     msg.style.marginLeft = "auto";
@@ -193,44 +194,33 @@ window.onload = function() {
     }
   }
 
-// --- Receipt Date Validation ---
-if (date) {
-  // Fill input field with slashes
-  document.getElementById("date").value = date.replace(/-/g, "/");
+  // --- Receipt Date Validation ---
+  if (date) {
+    const [day, month, year] = date.split("-");
+    const receiptDate = new Date(`${year}-${month}-${day}`);
+    const nextMonth = new Date(receiptDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
+    const today = new Date();
 
-  // Use original (with '-') for validation
-  const [day, month, year] = date.split("-");
-  const receiptDate = new Date(`${year}-${month}-${day}`);
-  const nextMonth = new Date(receiptDate);
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
-  const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
-  const today = new Date();
+    if (today > cutoffDate) {
+      const form = document.getElementById("invoiceForm");
+      if (form) {
+        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
 
-  if (today > cutoffDate) {
-    const form = document.getElementById("invoiceForm");
-    if (form) {
-      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+        const submitBtn = form.querySelector('[type="submit"]');
+        if (submitBtn) submitBtn.style.display = "none";
 
-      const submitBtn = form.querySelector('[type="submit"]');
-      if (submitBtn) submitBtn.style.display = "none";
-
-      const msg = document.createElement("div");
-      msg.textContent = "⚠️ Receipt already submitted after the 3rd date of the next month";
-      msg.style.background = "#fff8c4";
-      msg.style.color = "#d8000c";
-      msg.style.fontSize = "18px";
-      msg.style.fontFamily = "Arial, sans-serif";
-      msg.style.fontWeight = "bold";
-      msg.style.padding = "12px";
-      msg.style.marginBottom = "15px";
-      msg.style.border = "1px solid #d8000c";
-      msg.style.borderRadius = "6px";
-      msg.style.textAlign = "center";
-
-      form.parentNode.insertBefore(msg, form);
+        // Show validation warning (top of form)
+        const msg = showMessage(
+          "⚠️ Receipt already submitted after the 3rd date of the next month",
+          "#fff8c4",  // light yellow
+          "#d8000c"   // red
+        );
+        form.parentNode.insertBefore(msg, form);
+      }
     }
   }
-}
 
   // --- Input Formatting Functions ---
   const formatUpperSingleSpace = el => el.addEventListener("input", function(){
@@ -265,7 +255,6 @@ if (date) {
   // --- TIN Checkbox Logic ---
   tinOption.addEventListener("change", function () {
     if (classification.value === "Business") {
-      // Business: N/A option
       if (this.checked) {
         tinInput.value = "N/A";
         tinInput.disabled = true;
@@ -274,7 +263,6 @@ if (date) {
         tinInput.disabled = false;
       }
     } else if (classification.value === "Government") {
-      // Government: General option
       if (this.checked) {
         tinInput.value = "EI00000000040";
         tinInput.disabled = true;
@@ -283,7 +271,6 @@ if (date) {
         tinInput.disabled = false;
       }
     } else if (classification.value === "Individual") {
-      // Individual: General option
       const identityType = document.getElementById("identityType").value;
       if (this.checked) {
         tinInput.value =
@@ -304,21 +291,19 @@ if (date) {
     }
   }
 
-  // --- Classification Change Logic (with Identity above TIN for Individual) ---
+  // --- Classification Change Logic ---
   classification.addEventListener("change", function () {
     tinSection.style.display = "none";
     identitySection.style.display = "none";
     brnSection.style.display = "none";
     sstSection.style.display = "none";
 
-    // Reset required states
     setRequired(tinInput, false);
     setRequired(document.getElementById("identityType"), false);
     setRequired(document.getElementById("identityValue"), false);
     setRequired(document.getElementById("brn"), false);
     setRequired(document.getElementById("sst"), false);
 
-    // Reset TIN
     tinOption.checked = false;
     tinInput.value = "";
     tinInput.disabled = false;
@@ -344,7 +329,6 @@ if (date) {
       tinSection.style.display = "block";
       tinLabel.innerText = "General";
 
-      // Place Identity before TIN
       identitySection.parentNode.insertBefore(identitySection, tinSection);
 
       setRequired(document.getElementById("identityType"), true);
@@ -353,7 +337,7 @@ if (date) {
     }
   });
 
-  // --- Identity Change Handling (for Individual) ---
+  // --- Identity Change Handling ---
   document.getElementById("identityType").addEventListener("change", function () {
     if (classification.value === "Individual") {
       tinOption.checked = false;
@@ -362,51 +346,48 @@ if (date) {
     }
   });
 
-// --- SST N/A Handling ---
-document.getElementById("sstNA").addEventListener("change", function () {
-  const sst = document.getElementById("sst");
-  if (this.checked) {
-    sst.value = "N/A";   // ✅ send N/A instead of empty
-    sst.disabled = true;
-  } else {
-    sst.value = "";
-    sst.disabled = false;
-  }
-});
+  // --- SST N/A Handling ---
+  document.getElementById("sstNA").addEventListener("change", function () {
+    const sst = document.getElementById("sst");
+    if (this.checked) {
+      sst.value = "N/A";
+      sst.disabled = true;
+    } else {
+      sst.value = "";
+      sst.disabled = false;
+    }
+  });
 
-// --- Country/State Handling ---
-const country = document.getElementById("country");
-country.addEventListener("change", function () {
-  let stateWrapper = document.getElementById("stateWrapper");
+  // --- Country/State Handling ---
+  const country = document.getElementById("country");
+  country.addEventListener("change", function () {
+    let stateWrapper = document.getElementById("stateWrapper");
 
-  if (this.value === "Malaysia") {
-    stateWrapper.innerHTML = `
-      <label for="state">State:</label>
-      <select id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-        <option value="">-- Please select a state --</option>
-        <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
-        <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
-        <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
-        <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
-        <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
-      </select>`;
-  } else {
-    stateWrapper.innerHTML = `
-      <label for="state">State / Province / Region:</label>
-      <input type="text" id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;" placeholder="Enter state / province / region">`;
-    formatUpperSingleSpace(document.getElementById("state"));
-  }
+    if (this.value === "Malaysia") {
+      stateWrapper.innerHTML = `
+        <label for="state">State:</label>
+        <select id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+          <option value="">-- Please select a state --</option>
+          <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
+          <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
+          <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
+          <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
+          <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
+        </select>`;
+    } else {
+      stateWrapper.innerHTML = `
+        <label for="state">State / Province / Region:</label>
+        <input type="text" id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;" placeholder="Enter state / province / region">`;
+      formatUpperSingleSpace(document.getElementById("state"));
+    }
 
-  // Re-apply required with helper
-  let newState = document.getElementById("state");
-  setRequired(newState, true);
-});
+    let newState = document.getElementById("state");
+    setRequired(newState, true);
+  });
 
-  // --- Web App Submission ---
-  const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec"; 
+  // --- Form Submission ---
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec";
   const form = document.getElementById("invoiceForm");
-  const submitBtn = form.querySelector('[type="submit"]');
-
   const statusBar = document.createElement("div");
   statusBar.style.display = "none";
   form.parentNode.appendChild(statusBar);
@@ -414,104 +395,71 @@ country.addEventListener("change", function () {
   form.addEventListener("submit", function(e){
     e.preventDefault();
 
-    const formData = {
-      date: document.getElementById("date").value,
-      invoice: document.getElementById("invoice").value,
-      amount: document.getElementById("amount").value,
-      terminal: document.getElementById("terminal").value,
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      classification: document.getElementById("classification").value,
-      tin: document.getElementById("tinInput").value,
-      identityType: document.getElementById("identityType").value,
-      identityValue: document.getElementById("identityValue").value,
-      brn: document.getElementById("brn").value,
-      sst: document.getElementById("sst").value,
-      contact: document.getElementById("contact").value,
-      address1: document.getElementById("address1").value,
-      address2: document.getElementById("address2").value,
-      address3: document.getElementById("address3").value,
-      postcode: document.getElementById("postcode").value,
-      city: document.getElementById("city").value,
-      state: document.getElementById("state").value,
-      country: document.getElementById("country").value
-    };
+    const formData = Object.fromEntries(new FormData(form).entries());
 
-statusBar.innerHTML = "";
-
-// Submitting message
-const submittingMsg = document.createElement("div");
-submittingMsg.textContent = "⏳ Submitting...";
-submittingMsg.style.background = "#cce5ff";   // light blue
-submittingMsg.style.color = "#004085";        // dark blue
-submittingMsg.style.fontSize = "18px";        // bigger text
-submittingMsg.style.fontFamily = "Arial, sans-serif";
-submittingMsg.style.fontWeight = "bold";
-submittingMsg.style.padding = "12px";
-submittingMsg.style.marginBottom = "10px";
-submittingMsg.style.border = "1px solid #004085";
-submittingMsg.style.borderRadius = "6px";
-submittingMsg.style.textAlign = "center";
-
-statusBar.appendChild(submittingMsg);
-statusBar.style.display = "block";
-
-fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
-  .then(res => res.json())
-  .then(data => {
     statusBar.innerHTML = "";
-    const msg = document.createElement("div");
 
-    if (data.status === "success") {
-      msg.textContent = "✅ Submission successful!";
-      msg.style.background = "#d4edda";   // light green
-      msg.style.color = "#155724";        // dark green
-      form.reset();
-    } else {
-      msg.textContent = "❌ Submission failed: " + (data.message || "");
-      msg.style.background = "#f8d7da";   // light red
-      msg.style.color = "#721c24";        // dark red
-    }
+    const submittingMsg = document.createElement("div");
+    submittingMsg.textContent = "⏳ Submitting...";
+    submittingMsg.style.background = "#cce5ff";
+    submittingMsg.style.color = "#004085";
+    submittingMsg.style.fontSize = "18px";
+    submittingMsg.style.fontFamily = "Arial, sans-serif";
+    submittingMsg.style.fontWeight = "bold";
+    submittingMsg.style.padding = "12px";
+    submittingMsg.style.marginBottom = "10px";
+    submittingMsg.style.border = "1px solid #004085";
+    submittingMsg.style.borderRadius = "6px";
+    submittingMsg.style.textAlign = "center";
 
-    msg.style.fontSize = "18px";
-    msg.style.fontFamily = "Arial, sans-serif";
-    msg.style.fontWeight = "bold";
-    msg.style.padding = "12px";
-    msg.style.marginBottom = "10px";
-    msg.style.border = "1px solid currentColor";
-    msg.style.borderRadius = "6px";
-    msg.style.textAlign = "center";
+    statusBar.appendChild(submittingMsg);
+    statusBar.style.display = "block";
 
-    statusBar.appendChild(msg);
-  })
-  .catch(err => {
-    statusBar.innerHTML = "";
-    const msg = document.createElement("div");
-    msg.textContent = "❌ Submission failed: " + err;
-    msg.style.background = "#f8d7da";
-    msg.style.color = "#721c24";
-    msg.style.fontSize = "18px";
-    msg.style.fontFamily = "Arial, sans-serif";
-    msg.style.fontWeight = "bold";
-    msg.style.padding = "12px";
-    msg.style.marginBottom = "10px";
-    msg.style.border = "1px solid #721c24";
-    msg.style.borderRadius = "6px";
-    msg.style.textAlign = "center";
+    fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
+      .then(res => res.json())
+      .then(data => {
+        statusBar.innerHTML = "";
+        const msg = document.createElement("div");
 
-    statusBar.appendChild(msg);
+        if (data.status === "success") {
+          msg.textContent = "✅ Submission successful!";
+          msg.style.background = "#d4edda";
+          msg.style.color = "#155724";
+          form.reset();
+        } else {
+          msg.textContent = "❌ Submission failed: " + (data.message || "");
+          msg.style.background = "#f8d7da";
+          msg.style.color = "#721c24";
+        }
+
+        msg.style.fontSize = "18px";
+        msg.style.fontFamily = "Arial, sans-serif";
+        msg.style.fontWeight = "bold";
+        msg.style.padding = "12px";
+        msg.style.marginBottom = "10px";
+        msg.style.border = "1px solid currentColor";
+        msg.style.borderRadius = "6px";
+        msg.style.textAlign = "center";
+
+        statusBar.appendChild(msg);
+      })
+      .catch(err => {
+        statusBar.innerHTML = "";
+        const msg = document.createElement("div");
+        msg.textContent = "❌ Submission failed: " + err;
+        msg.style.background = "#f8d7da";
+        msg.style.color = "#721c24";
+        msg.style.fontSize = "18px";
+        msg.style.fontFamily = "Arial, sans-serif";
+        msg.style.fontWeight = "bold";
+        msg.style.padding = "12px";
+        msg.style.marginBottom = "10px";
+        msg.style.border = "1px solid #721c24";
+        msg.style.borderRadius = "6px";
+        msg.style.textAlign = "center";
+
+        statusBar.appendChild(msg);
+      });
   });
-});
-
+};
 </script>
-
-
-
-
-
-
-
-
-
-
-
