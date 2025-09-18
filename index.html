@@ -365,23 +365,34 @@ country.addEventListener("change", function () {
   let stateContainer = document.getElementById("state");
 
   if (this.value === "Malaysia") {
-    stateContainer.outerHTML = `<select id="state" style="width:100%;margin-bottom:10px;">
-      <option value="">-- Please select a state --</option>
-      <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
-      <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
-      <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
-      <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
-      <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
-    </select>`;
+    stateContainer.outerHTML = `
+      <div id="stateWrapper" style="flex:2;min-width:200px;">
+        <label>State:</label>
+        <select id="state" required 
+                style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+          <option value="">-- Please select a state --</option>
+          <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
+          <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
+          <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
+          <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
+          <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
+        </select>
+      </div>`;
   } else {
-    stateContainer.outerHTML = '<input type="text" id="state" style="width:100%;margin-bottom:10px;" placeholder="Enter state / province / region">';
+    stateContainer.outerHTML = `
+      <div id="stateWrapper" style="flex:2;min-width:200px;">
+        <label>State:</label>
+        <input type="text" id="state" required placeholder="Enter state / province / region"
+               style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      </div>`;
     formatUpperSingleSpace(document.getElementById("state"));
   }
 
-  // Re-apply required with helper
+  // ✅ Re-apply required with helper
   let newState = document.getElementById("state");
   setRequired(newState, true);
 });
+
 
   // --- Web App Submission ---
   const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec"; 
@@ -441,6 +452,7 @@ country.addEventListener("change", function () {
 
 };
 </script>
+
 
 
 
