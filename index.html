@@ -390,26 +390,52 @@ const formBody = Object.keys(formData)
 fetch(scriptURL, {
   method: "POST",
   headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  body: formBody
+  body: new URLSearchParams(formData).toString()
 })
-    .then(res=>res.json())
-    .then(data=>{
-      statusBar.innerHTML=""; const msg=document.createElement("div");
-      if(data.status==="success"){ msg.textContent="✅ Submission successful!"; msg.style.background="#d4edda"; msg.style.color="#155724"; form.reset();}
-      else{ msg.textContent="❌ Submission failed: "+(data.message||""); msg.style.background="#f8d7da"; msg.style.color="#721c24"; }
-      msg.style.fontSize="18px"; msg.style.fontFamily="Arial, sans-serif"; msg.style.fontWeight="bold";
-      msg.style.padding="12px"; msg.style.marginBottom="10px"; msg.style.border="1px solid currentColor";
-      msg.style.borderRadius="6px"; msg.style.textAlign="center"; statusBar.appendChild(msg);
-    })
-    .catch(err=>{
-      statusBar.innerHTML=""; const msg=document.createElement("div"); msg.textContent="❌ Submission failed: "+err;
-      msg.style.background="#f8d7da"; msg.style.color="#721c24"; msg.style.fontSize="18px"; msg.style.fontFamily="Arial, sans-serif";
-      msg.style.fontWeight="bold"; msg.style.padding="12px"; msg.style.marginBottom="10px"; msg.style.border="1px solid #721c24";
-      msg.style.borderRadius="6px"; msg.style.textAlign="center"; statusBar.appendChild(msg);
+.then(res => res.text())  // Apps Script will return plain text
+.then(data => {
+  statusBar.innerHTML = "";
+  const msg = document.createElement("div");
+  msg.style.fontSize = "18px";
+  msg.style.fontFamily = "Arial, sans-serif";
+  msg.style.fontWeight = "bold";
+  msg.style.padding = "12px";
+  msg.style.marginBottom = "10px";
+  msg.style.borderRadius = "6px";
+  msg.style.textAlign = "center";
+
+  if(data.includes("success")){
+    msg.textContent = "✅ Submission successful!";
+    msg.style.background = "#d4edda";
+    msg.style.color = "#155724";
+    form.reset();
+  } else {
+    msg.textContent = "❌ Submission failed: " + data;
+    msg.style.background = "#f8d7da";
+    msg.style.color = "#721c24";
+  }
+  statusBar.appendChild(msg);
+})
+.catch(err => {
+  statusBar.innerHTML = "";
+  const msg = document.createElement("div");
+  msg.textContent = "❌ Submission failed: " + err;
+  msg.style.background = "#f8d7da";
+  msg.style.color = "#721c24";
+  msg.style.fontSize = "18px";
+  msg.style.fontFamily = "Arial, sans-serif";
+  msg.style.fontWeight = "bold";
+  msg.style.padding = "12px";
+  msg.style.marginBottom = "10px";
+  msg.style.border = "1px solid #721c24";
+  msg.style.borderRadius = "6px";
+  msg.style.textAlign = "center";
+  statusBar.appendChild(msg);
     });
   });
 
 });
 </script>
+
 
 
