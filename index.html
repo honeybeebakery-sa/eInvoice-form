@@ -178,15 +178,15 @@ window.onload = function() {
   const receipt = receiptParam ? decodeURIComponent(receiptParam) : null;
   const total = totalParam ? decodeURIComponent(totalParam) : null;
 
-  if(date) document.getElementById("date").value = date.replace(/-/g, "/");
-  if(receipt) document.getElementById("invoice").value = receipt;
-  if(total) document.getElementById("amount").value = "RM " + total;
+  if (date) document.getElementById("date").value = date.replace(/-/g, "/");
+  if (receipt) document.getElementById("invoice").value = receipt;
+  if (total) document.getElementById("amount").value = "RM " + total;
 
   const terminalSelect = document.getElementById("terminal");
-  if(receipt){
-    if(receipt.includes("T01")) terminalSelect.value = "T-01 (Pasar Counter 1)";
-    else if(receipt.includes("T02")) terminalSelect.value = "T-02 (Pasar Counter 2)";
-    else if(receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
+  if (receipt) {
+    if (receipt.includes("T01")) terminalSelect.value = "T-01 (Pasar Counter 1)";
+    else if (receipt.includes("T02")) terminalSelect.value = "T-02 (Pasar Counter 2)";
+    else if (receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
   }
 
   // --- Receipt Date Validation ---
@@ -249,20 +249,28 @@ window.onload = function() {
 
   // --- TIN Checkbox Logic ---
   tinOption.addEventListener("change", function () {
-    if (this.checked) {
-      // ✅ Always override with N/A when ticked
-      tinInput.value = "N/A";
-      tinInput.disabled = true;
-    } else {
-      // ✅ Follow classification rules when unticked
-      if (classification.value === "Business") {
+    if (classification.value === "Business") {
+      // Business: N/A option
+      if (this.checked) {
+        tinInput.value = "N/A";
+        tinInput.disabled = true;
+      } else {
         tinInput.value = "";
         tinInput.disabled = false;
-      } else if (classification.value === "Government") {
+      }
+    } else if (classification.value === "Government") {
+      // Government: General option
+      if (this.checked) {
         tinInput.value = "EI00000000040";
         tinInput.disabled = true;
-      } else if (classification.value === "Individual") {
-        const identityType = document.getElementById("identityType").value;
+      } else {
+        tinInput.value = "";
+        tinInput.disabled = false;
+      }
+    } else if (classification.value === "Individual") {
+      // Individual: General option
+      const identityType = document.getElementById("identityType").value;
+      if (this.checked) {
         tinInput.value =
           identityType === "Passport" ? "EI00000000020" : "EI00000000010";
         tinInput.disabled = true;
@@ -280,38 +288,36 @@ window.onload = function() {
     brnSection.style.display = "none";
     sstSection.style.display = "none";
 
+    // Reset TIN state
+    tinOption.checked = false;
+    tinInput.value = "";
+    tinInput.disabled = false;
+
     if (this.value === "Business") {
       tinSection.style.display = "block";
-      tinLabel.innerText = "N/A";
+      tinLabel.innerText = "N/A"; // ✅ Business shows N/A
       brnSection.style.display = "block";
       sstSection.style.display = "block";
     } else if (this.value === "Government") {
       tinSection.style.display = "block";
-      tinLabel.innerText = "General";
+      tinLabel.innerText = "General"; // ✅ Government shows General
     } else if (this.value === "Individual") {
       // Show Identity first
       identitySection.style.display = "block";
-      // Then show TIN below it
       tinSection.style.display = "block";
-      tinLabel.innerText = "General";
-      // Move TIN section *after* identity in DOM if needed
+      tinLabel.innerText = "General"; // ✅ Individual shows General
+
+      // Place Identity before TIN
       identitySection.parentNode.insertBefore(identitySection, tinSection);
     }
+  });
 
-    // ✅ Reapply TIN rules when classification changes
-    if (!tinOption.checked) {
-      if (this.value === "Government") {
-        tinInput.value = "EI00000000040";
-        tinInput.disabled = true;
-      } else if (this.value === "Individual") {
-        const identityType = document.getElementById("identityType").value;
-        tinInput.value =
-          identityType === "Passport" ? "EI00000000020" : "EI00000000010";
-        tinInput.disabled = true;
-      } else if (this.value === "Business") {
-        tinInput.value = "";
-        tinInput.disabled = false;
-      }
+  // --- Identity Change Handling (for Individual) ---
+  document.getElementById("identityType").addEventListener("change", function () {
+    if (classification.value === "Individual") {
+      tinOption.checked = false;
+      tinInput.value = "";
+      tinInput.disabled = false;
     }
   });
 
@@ -404,6 +410,7 @@ document.getElementById("sstNA").addEventListener("change", function () {
 
 };
 </script>
+
 
 
 
