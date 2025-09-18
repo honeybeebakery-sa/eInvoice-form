@@ -365,7 +365,7 @@ window.addEventListener("load", function () {
   });
 
   // --- Form Submission ---
-  const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbw9C7TqIZlAwgreAnOdNirGDchUMY_BdgoxQxzcXeCUjpx81UkDOYp5Ir7GRhM-UA/exec";
   const form = document.getElementById("invoiceForm");
   const statusBar = document.createElement("div"); statusBar.style.display="none";
   form.parentNode.appendChild(statusBar);
@@ -382,7 +382,11 @@ window.addEventListener("load", function () {
     submittingMsg.style.border="1px solid #004085"; submittingMsg.style.borderRadius="6px"; submittingMsg.style.textAlign="center";
     statusBar.appendChild(submittingMsg); statusBar.style.display="block";
 
-    fetch(scriptURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(formData)})
+    fetch(scriptURL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(formData)
+})
     .then(res=>res.json())
     .then(data=>{
       statusBar.innerHTML=""; const msg=document.createElement("div");
@@ -402,3 +406,4 @@ window.addEventListener("load", function () {
 
 });
 </script>
+
