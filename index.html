@@ -148,9 +148,26 @@
   </button>
 </form>
 
-
 <script>
 window.onload = function() {
+  // --- Helper function for status/warning messages ---
+  function showMessage(text, bgColor, textColor) {
+    const msg = document.createElement("div");
+    msg.innerText = text;
+    msg.style.background = bgColor;
+    msg.style.color = textColor;
+    msg.style.padding = "12px 20px";
+    msg.style.marginTop = "15px";
+    msg.style.borderRadius = "8px";
+    msg.style.fontWeight = "bold";
+    msg.style.fontSize = "14px";
+    msg.style.textAlign = "center";   // center text
+    msg.style.maxWidth = "600px";
+    msg.style.marginLeft = "auto";   // center box
+    msg.style.marginRight = "auto";
+    return msg;
+  }
+
   // --- URL Parameters & Autofill ---
   const params = new URLSearchParams(window.location.search);
   const dateParam = params.get("date");
@@ -172,41 +189,33 @@ window.onload = function() {
     else if(receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
   }
 
-// --- Receipt Date Validation ---
-if (date) {
-  const [day, month, year] = date.split("-");
-  const receiptDate = new Date(`${year}-${month}-${day}`);
-  const nextMonth = new Date(receiptDate);
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
-  const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
-  const today = new Date();
+  // --- Receipt Date Validation ---
+  if (date) {
+    const [day, month, year] = date.split("-");
+    const receiptDate = new Date(`${year}-${month}-${day}`);
+    const nextMonth = new Date(receiptDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
+    const today = new Date();
 
-  if (today > cutoffDate) {
-    const form = document.querySelector("form") || document.querySelector("div");
-    if (form) {
-      // Disable all inputs
-      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+    if (today > cutoffDate) {
+      const form = document.getElementById("invoiceForm");
+      if (form) {
+        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
 
-      const submitBtn = form.querySelector('[type="submit"]');
-      if (submitBtn) submitBtn.style.display = "none";
+        const submitBtn = form.querySelector('[type="submit"]');
+        if (submitBtn) submitBtn.style.display = "none";
 
-      // Validation message box
-      const msg = document.createElement("div");
-      msg.innerText = "⚠️ Receipt already submitted after the 3rd date of the next month";
-      msg.style.background = "#fff8c4";   // light yellow
-      msg.style.color = "#d8000c";        // red text
-      msg.style.padding = "12px";
-      msg.style.marginTop = "15px";
-      msg.style.border = "1px solid #f1c40f";
-      msg.style.borderRadius = "6px";
-      msg.style.fontWeight = "bold";
-      msg.style.fontSize = "14px";
-
-      // Append below the form
-      form.parentNode.appendChild(msg);
+        // Show validation warning (centered, styled)
+        const msg = showMessage(
+          "⚠️ Receipt already submitted after the 3rd date of the next month",
+          "#fff8c4",  // light yellow
+          "#d8000c"   // red
+        );
+        form.parentNode.appendChild(msg);
+      }
     }
   }
-}
 
   // --- Input Formatting Functions ---
   const formatUpperSingleSpace = el => el.addEventListener("input", function(){
@@ -280,71 +289,61 @@ if (date) {
     }
   });
 
-// --- Web App Submission ---
-const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec"; 
-const form = document.getElementById("invoiceForm");  // ✅ now it’s the real form
-const submitBtn = form.querySelector('[type="submit"]');
+  // --- Web App Submission ---
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec"; 
+  const form = document.getElementById("invoiceForm");
+  const submitBtn = form.querySelector('[type="submit"]');
 
-const statusBar = document.createElement("div");
-statusBar.style.padding = "10px";
-statusBar.style.borderRadius = "6px";
-statusBar.style.marginTop = "15px";
-statusBar.style.display = "none";
-form.appendChild(statusBar);
+  const statusBar = document.createElement("div");
+  statusBar.style.display = "none";
+  form.parentNode.appendChild(statusBar);
 
-form.addEventListener("submit", function(e){   // ✅ use submit listener instead of button click
-  e.preventDefault();
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
 
-  const formData = {
-    date: document.getElementById("date").value,
-    invoice: document.getElementById("invoice").value,
-    amount: document.getElementById("amount").value,
-    terminal: document.getElementById("terminal").value,
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    classification: document.getElementById("classification").value,
-    tin: document.getElementById("tinInput").value,
-    identityType: document.getElementById("identityType").value,
-    identityValue: document.getElementById("identityValue").value,
-    brn: document.getElementById("brn").value,
-    sst: document.getElementById("sst").value,
-    contact: document.getElementById("contact").value,
-    address1: document.getElementById("address1").value,
-    address2: document.getElementById("address2").value,
-    address3: document.getElementById("address3").value,
-    postcode: document.getElementById("postcode").value,
-    city: document.getElementById("city").value,
-    state: document.getElementById("state").value,
-    country: document.getElementById("country").value
-  };
+    const formData = {
+      date: document.getElementById("date").value,
+      invoice: document.getElementById("invoice").value,
+      amount: document.getElementById("amount").value,
+      terminal: document.getElementById("terminal").value,
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      classification: document.getElementById("classification").value,
+      tin: document.getElementById("tinInput").value,
+      identityType: document.getElementById("identityType").value,
+      identityValue: document.getElementById("identityValue").value,
+      brn: document.getElementById("brn").value,
+      sst: document.getElementById("sst").value,
+      contact: document.getElementById("contact").value,
+      address1: document.getElementById("address1").value,
+      address2: document.getElementById("address2").value,
+      address3: document.getElementById("address3").value,
+      postcode: document.getElementById("postcode").value,
+      city: document.getElementById("city").value,
+      state: document.getElementById("state").value,
+      country: document.getElementById("country").value
+    };
 
-  statusBar.style.backgroundColor = "#cce5ff";
-  statusBar.innerText = "Submitting...";
-  statusBar.style.display = "block";
+    statusBar.innerHTML = "";
+    statusBar.appendChild(showMessage("⏳ Submitting...", "#cce5ff", "#004085"));
+    statusBar.style.display = "block";
 
-  fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
-    .then(res => res.json())
-    .then(data => {
-      if(data.status === "success"){
-        statusBar.style.backgroundColor = "#d4edda";
-        statusBar.innerText = "✅ Submission successful!";
-        form.reset();  // ✅ now works
-      } else {
-        statusBar.style.backgroundColor = "#f8d7da";
-        statusBar.innerText = "❌ Submission failed: " + (data.message || "");
-      }
-    })
-    .catch(err => {
-      statusBar.style.backgroundColor = "#f8d7da";
-      statusBar.innerText = "❌ Submission failed: " + err;
-    });
-});
+    fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
+      .then(res => res.json())
+      .then(data => {
+        statusBar.innerHTML = "";
+        if(data.status === "success"){
+          statusBar.appendChild(showMessage("✅ Submission successful!", "#d4edda", "#155724"));
+          form.reset();
+        } else {
+          statusBar.appendChild(showMessage("❌ Submission failed: " + (data.message || ""), "#f8d7da", "#721c24"));
+        }
+      })
+      .catch(err => {
+        statusBar.innerHTML = "";
+        statusBar.appendChild(showMessage("❌ Submission failed: " + err, "#f8d7da", "#721c24"));
+      });
+  });
 
 };
 </script>
-
-
-
-
-
-
