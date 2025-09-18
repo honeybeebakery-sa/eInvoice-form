@@ -192,33 +192,43 @@ window.onload = function() {
     else if (receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
   }
 
-  // --- Receipt Date Validation ---
-  if (date) {
-    const [day, month, year] = date.split("-");
-    const receiptDate = new Date(`${year}-${month}-${day}`);
-    const nextMonth = new Date(receiptDate);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
-    const today = new Date();
+// --- Receipt Date Validation ---
+if (date) {
+  const [day, month, year] = date.split("-");
+  const receiptDate = new Date(`${year}-${month}-${day}`);
+  const nextMonth = new Date(receiptDate);
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
+  const today = new Date();
 
-    if (today > cutoffDate) {
-      const form = document.getElementById("invoiceForm");
-      if (form) {
-        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+  if (today > cutoffDate) {
+    const form = document.getElementById("invoiceForm");
+    if (form) {
+      // Disable all form inputs
+      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
 
-        const submitBtn = form.querySelector('[type="submit"]');
-        if (submitBtn) submitBtn.style.display = "none";
+      // Hide submit button
+      const submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.style.display = "none";
 
-        // Show validation warning (centered, styled)
-        const msg = showMessage(
-          "⚠️ Receipt already submitted after the 3rd date of the next month",
-          "#fff8c4",  // light yellow
-          "#d8000c"   // red
-        );
-        form.parentNode.appendChild(msg);
-      }
+      // Show validation warning (styled, above form)
+      const msg = document.createElement("div");
+      msg.textContent = "⚠️ Receipt already submitted after the 3rd date of the next month";
+      msg.style.background = "#fff8c4";   // light yellow
+      msg.style.color = "#d8000c";        // red text
+      msg.style.fontSize = "18px";        // bigger text
+      msg.style.fontFamily = "Arial, sans-serif";
+      msg.style.fontWeight = "bold";
+      msg.style.padding = "12px";
+      msg.style.marginBottom = "15px";
+      msg.style.border = "1px solid #d8000c";
+      msg.style.borderRadius = "6px";
+      msg.style.textAlign = "center";
+
+      form.parentNode.insertBefore(msg, form);
     }
   }
+}
 
   // --- Input Formatting Functions ---
   const formatUpperSingleSpace = el => el.addEventListener("input", function(){
@@ -425,29 +435,74 @@ country.addEventListener("change", function () {
       country: document.getElementById("country").value
     };
 
+statusBar.innerHTML = "";
+
+// Submitting message
+const submittingMsg = document.createElement("div");
+submittingMsg.textContent = "⏳ Submitting...";
+submittingMsg.style.background = "#cce5ff";   // light blue
+submittingMsg.style.color = "#004085";        // dark blue
+submittingMsg.style.fontSize = "18px";        // bigger text
+submittingMsg.style.fontFamily = "Arial, sans-serif";
+submittingMsg.style.fontWeight = "bold";
+submittingMsg.style.padding = "12px";
+submittingMsg.style.marginBottom = "10px";
+submittingMsg.style.border = "1px solid #004085";
+submittingMsg.style.borderRadius = "6px";
+submittingMsg.style.textAlign = "center";
+
+statusBar.appendChild(submittingMsg);
+statusBar.style.display = "block";
+
+fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
+  .then(res => res.json())
+  .then(data => {
     statusBar.innerHTML = "";
-    statusBar.appendChild(showMessage("⏳ Submitting...", "#cce5ff", "#004085"));
-    statusBar.style.display = "block";
+    const msg = document.createElement("div");
 
-    fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
-      .then(res => res.json())
-      .then(data => {
-        statusBar.innerHTML = "";
-        if(data.status === "success"){
-          statusBar.appendChild(showMessage("✅ Submission successful!", "#d4edda", "#155724"));
-          form.reset();
-        } else {
-          statusBar.appendChild(showMessage("❌ Submission failed: " + (data.message || ""), "#f8d7da", "#721c24"));
-        }
-      })
-      .catch(err => {
-        statusBar.innerHTML = "";
-        statusBar.appendChild(showMessage("❌ Submission failed: " + err, "#f8d7da", "#721c24"));
-      });
+    if (data.status === "success") {
+      msg.textContent = "✅ Submission successful!";
+      msg.style.background = "#d4edda";   // light green
+      msg.style.color = "#155724";        // dark green
+      form.reset();
+    } else {
+      msg.textContent = "❌ Submission failed: " + (data.message || "");
+      msg.style.background = "#f8d7da";   // light red
+      msg.style.color = "#721c24";        // dark red
+    }
+
+    msg.style.fontSize = "18px";
+    msg.style.fontFamily = "Arial, sans-serif";
+    msg.style.fontWeight = "bold";
+    msg.style.padding = "12px";
+    msg.style.marginBottom = "10px";
+    msg.style.border = "1px solid currentColor";
+    msg.style.borderRadius = "6px";
+    msg.style.textAlign = "center";
+
+    statusBar.appendChild(msg);
+  })
+  .catch(err => {
+    statusBar.innerHTML = "";
+    const msg = document.createElement("div");
+    msg.textContent = "❌ Submission failed: " + err;
+    msg.style.background = "#f8d7da";
+    msg.style.color = "#721c24";
+    msg.style.fontSize = "18px";
+    msg.style.fontFamily = "Arial, sans-serif";
+    msg.style.fontWeight = "bold";
+    msg.style.padding = "12px";
+    msg.style.marginBottom = "10px";
+    msg.style.border = "1px solid #721c24";
+    msg.style.borderRadius = "6px";
+    msg.style.textAlign = "center";
+
+    statusBar.appendChild(msg);
   });
+});
 
-};
 </script>
+
 
 
 
