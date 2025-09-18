@@ -174,7 +174,8 @@
 </form>
 
 <script>
-window.onload = function () {
+window.addEventListener("load", function () {
+
   // --- Helper function for status/warning messages ---
   function showMessage(text, bgColor, textColor) {
     const msg = document.createElement("div");
@@ -185,7 +186,7 @@ window.onload = function () {
     msg.style.marginTop = "15px";
     msg.style.borderRadius = "8px";
     msg.style.fontWeight = "bold";
-    msg.style.fontSize = "18px"; // bigger
+    msg.style.fontSize = "18px";
     msg.style.fontFamily = "Arial, sans-serif";
     msg.style.textAlign = "center";
     msg.style.maxWidth = "600px";
@@ -194,11 +195,11 @@ window.onload = function () {
     return msg;
   }
 
-  // --- URL Parameters & Autofill ---
+  // --- URL Parameters & Autofill (case-insensitive) ---
   const params = new URLSearchParams(window.location.search);
-  const date = params.get("date");
-  const receipt = params.get("receipt");
-  const total = params.get("total");
+  const date = params.get("date") || params.get("Date");
+  const receipt = params.get("receipt") || params.get("Receipt");
+  const total = params.get("total") || params.get("Total");
 
   if (date) document.getElementById("date").value = date.replace(/-/g, "/");
   if (receipt) document.getElementById("invoice").value = receipt;
@@ -207,13 +208,9 @@ window.onload = function () {
   // Terminal auto-select
   const terminalSelect = document.getElementById("terminal");
   if (receipt) {
-    if (/T01/i.test(receipt)) {
-      terminalSelect.value = "T-01 (Pasar Counter 1)";
-    } else if (/T02/i.test(receipt)) {
-      terminalSelect.value = "T-02 (Pasar Counter 2)";
-    } else if (/T04/i.test(receipt)) {
-      terminalSelect.value = "T-01 (Lian Yi Counter)";
-    }
+    if (/T01/i.test(receipt)) terminalSelect.value = "T-01 (Pasar Counter 1)";
+    else if (/T02/i.test(receipt)) terminalSelect.value = "T-02 (Pasar Counter 2)";
+    else if (/T04/i.test(receipt)) terminalSelect.value = "T-01 (Lian Yi Counter)";
   }
 
   // --- Receipt Date Validation ---
@@ -229,15 +226,12 @@ window.onload = function () {
       const form = document.getElementById("invoiceForm");
       if (form) {
         [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
-
         const submitBtn = form.querySelector('[type="submit"]');
         if (submitBtn) submitBtn.style.display = "none";
-
-        // Show validation warning (top of form)
         const msg = showMessage(
           "⚠️ Receipt already submitted after the 3rd date of the next month",
-          "#fff8c4",  // light yellow
-          "#d8000c"   // red
+          "#fff8c4",
+          "#d8000c"
         );
         form.parentNode.insertBefore(msg, form);
       }
@@ -254,15 +248,16 @@ window.onload = function () {
   const formatNumberSymbolsOnly = el => el.addEventListener("input", function(){
     this.value = this.value.replace(/[^0-9+()-]/g,"");
   });
-const formatDigitsOnly = el => el.addEventListener("input", function(){
-  this.value = this.value.replace(/\D/g,""); // allow only 0–9
-});
-const formatCity = el => el.addEventListener("input", function(){
-  this.value = this.value.toUpperCase().replace(/\s+/g," ").trimStart();
-});
+  const formatDigitsOnly = el => el.addEventListener("input", function(){
+    this.value = this.value.replace(/\D/g,"");
+  });
+  const formatCity = el => el.addEventListener("input", function(){
+    this.value = this.value.toUpperCase().replace(/\s+/g," ").trimStart();
+  });
 
-formatCity(document.getElementById("city"));
-formatDigitsOnly(document.getElementById("postcode"));
+  // Apply formatting
+  formatCity(document.getElementById("city"));
+  formatDigitsOnly(document.getElementById("postcode"));
   formatUpperSingleSpace(document.getElementById("name"));
   formatLowerNoSpace(document.getElementById("email"));
   formatUpperSingleSpace(document.getElementById("tinInput"));
@@ -285,40 +280,21 @@ formatDigitsOnly(document.getElementById("postcode"));
   // --- TIN Checkbox Logic ---
   tinOption.addEventListener("change", function () {
     if (classification.value === "Business") {
-      if (this.checked) {
-        tinInput.value = "N/A";
-        tinInput.disabled = true;
-      } else {
-        tinInput.value = "";
-        tinInput.disabled = false;
-      }
+      tinInput.value = this.checked ? "N/A" : "";
+      tinInput.disabled = this.checked;
     } else if (classification.value === "Government") {
-      if (this.checked) {
-        tinInput.value = "EI00000000040";
-        tinInput.disabled = true;
-      } else {
-        tinInput.value = "";
-        tinInput.disabled = false;
-      }
+      tinInput.value = this.checked ? "EI00000000040" : "";
+      tinInput.disabled = this.checked;
     } else if (classification.value === "Individual") {
       const identityType = document.getElementById("identityType").value;
-      if (this.checked) {
-        tinInput.value =
-          identityType === "Passport" ? "EI00000000020" : "EI00000000010";
-        tinInput.disabled = true;
-      } else {
-        tinInput.value = "";
-        tinInput.disabled = false;
-      }
+      tinInput.value = this.checked ? (identityType === "Passport" ? "EI00000000020" : "EI00000000010") : "";
+      tinInput.disabled = this.checked;
     }
   });
 
   // --- Toggle Required Attributes ---
   function setRequired(el, isRequired) {
-    if (el) {
-      if (isRequired) el.setAttribute("required", "true");
-      else el.removeAttribute("required");
-    }
+    if (el) isRequired ? el.setAttribute("required","true") : el.removeAttribute("required");
   }
 
   // --- Classification Change Logic ---
@@ -328,171 +304,101 @@ formatDigitsOnly(document.getElementById("postcode"));
     brnSection.style.display = "none";
     sstSection.style.display = "none";
 
-    setRequired(tinInput, false);
-    setRequired(document.getElementById("identityType"), false);
-    setRequired(document.getElementById("identityValue"), false);
-    setRequired(document.getElementById("brn"), false);
-    setRequired(document.getElementById("sst"), false);
+    setRequired(tinInput,false);
+    setRequired(document.getElementById("identityType"),false);
+    setRequired(document.getElementById("identityValue"),false);
+    setRequired(document.getElementById("brn"),false);
+    setRequired(document.getElementById("sst"),false);
 
     tinOption.checked = false;
     tinInput.value = "";
     tinInput.disabled = false;
 
     if (this.value === "Business") {
-      tinSection.style.display = "block";
-      tinLabel.innerText = "N/A";
-      brnSection.style.display = "block";
-      sstSection.style.display = "block";
-
-      setRequired(tinInput, true);
-      setRequired(document.getElementById("brn"), true);
-      setRequired(document.getElementById("sst"), true);
-
+      tinSection.style.display = "block"; tinLabel.innerText="N/A";
+      brnSection.style.display = "block"; sstSection.style.display="block";
+      setRequired(tinInput,true); setRequired(document.getElementById("brn"),true); setRequired(document.getElementById("sst"),true);
     } else if (this.value === "Government") {
-      tinSection.style.display = "block";
-      tinLabel.innerText = "General";
-
-      setRequired(tinInput, true);
-
+      tinSection.style.display = "block"; tinLabel.innerText="General";
+      setRequired(tinInput,true);
     } else if (this.value === "Individual") {
-      identitySection.style.display = "block";
-      tinSection.style.display = "block";
-      tinLabel.innerText = "General";
-
-      identitySection.parentNode.insertBefore(identitySection, tinSection);
-
-      setRequired(document.getElementById("identityType"), true);
-      setRequired(document.getElementById("identityValue"), true);
-      setRequired(tinInput, true);
+      identitySection.style.display="block"; tinSection.style.display="block"; tinLabel.innerText="General";
+      identitySection.parentNode.insertBefore(identitySection,tinSection);
+      setRequired(document.getElementById("identityType"),true); setRequired(document.getElementById("identityValue"),true); setRequired(tinInput,true);
     }
   });
 
   // --- Identity Change Handling ---
   document.getElementById("identityType").addEventListener("change", function () {
     if (classification.value === "Individual") {
-      tinOption.checked = false;
-      tinInput.value = "";
-      tinInput.disabled = false;
+      tinOption.checked=false; tinInput.value=""; tinInput.disabled=false;
     }
   });
 
   // --- SST N/A Handling ---
   document.getElementById("sstNA").addEventListener("change", function () {
-    const sst = document.getElementById("sst");
-    if (this.checked) {
-      sst.value = "N/A";
-      sst.disabled = true;
-    } else {
-      sst.value = "";
-      sst.disabled = false;
-    }
+    const sst=document.getElementById("sst");
+    if (this.checked) { sst.value="N/A"; sst.disabled=true; }
+    else { sst.value=""; sst.disabled=false; }
   });
 
   // --- Country/State Handling ---
   const country = document.getElementById("country");
   country.addEventListener("change", function () {
-    let stateWrapper = document.getElementById("stateWrapper");
-
-    if (this.value === "Malaysia") {
-      stateWrapper.innerHTML = `
-        <label for="state">State:</label>
-        <select id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-          <option value="">-- Please select a state --</option>
-          <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
-          <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
-          <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
-          <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
-          <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
-        </select>`;
+    const stateWrapper=document.getElementById("stateWrapper");
+    if (this.value==="Malaysia") {
+      stateWrapper.innerHTML=`<label for="state">State:</label>
+      <select id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <option value="">-- Please select a state --</option>
+      <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
+      <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
+      <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
+      <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
+      <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
+      </select>`;
     } else {
-      stateWrapper.innerHTML = `
-        <label for="state">State / Province / Region:</label>
-        <input type="text" id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;" placeholder="Enter state / province / region">`;
+      stateWrapper.innerHTML=`<label for="state">State / Province / Region:</label>
+      <input type="text" id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;" placeholder="Enter state / province / region">`;
       formatUpperSingleSpace(document.getElementById("state"));
     }
-
-    let newState = document.getElementById("state");
-    setRequired(newState, true);
+    setRequired(document.getElementById("state"),true);
   });
 
   // --- Form Submission ---
   const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec";
   const form = document.getElementById("invoiceForm");
-  const statusBar = document.createElement("div");
-  statusBar.style.display = "none";
+  const statusBar = document.createElement("div"); statusBar.style.display="none";
   form.parentNode.appendChild(statusBar);
 
-form.addEventListener("submit", function(e){
-  e.preventDefault();
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(form).entries());
+    statusBar.innerHTML="";
+    const submittingMsg=document.createElement("div");
+    submittingMsg.textContent="⏳ Submitting...";
+    submittingMsg.style.background="#cce5ff"; submittingMsg.style.color="#004085";
+    submittingMsg.style.fontSize="18px"; submittingMsg.style.fontFamily="Arial, sans-serif";
+    submittingMsg.style.fontWeight="bold"; submittingMsg.style.padding="12px"; submittingMsg.style.marginBottom="10px";
+    submittingMsg.style.border="1px solid #004085"; submittingMsg.style.borderRadius="6px"; submittingMsg.style.textAlign="center";
+    statusBar.appendChild(submittingMsg); statusBar.style.display="block";
 
-  const formData = Object.fromEntries(new FormData(form).entries());
-
-  statusBar.innerHTML = "";
-
-  const submittingMsg = document.createElement("div");
-  submittingMsg.textContent = "⏳ Submitting...";
-  submittingMsg.style.background = "#cce5ff";
-  submittingMsg.style.color = "#004085";
-  submittingMsg.style.fontSize = "18px";
-  submittingMsg.style.fontFamily = "Arial, sans-serif";
-  submittingMsg.style.fontWeight = "bold";
-  submittingMsg.style.padding = "12px";
-  submittingMsg.style.marginBottom = "10px";
-  submittingMsg.style.border = "1px solid #004085";
-  submittingMsg.style.borderRadius = "6px";
-  submittingMsg.style.textAlign = "center";
-
-  statusBar.appendChild(submittingMsg);
-  statusBar.style.display = "block";
-
-  fetch(scriptURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" }, // <-- Add this
-    body: JSON.stringify(formData)
-  })
-  .then(res => res.json())
-  .then(data => {
-    statusBar.innerHTML = "";
-    const msg = document.createElement("div");
-
-    if (data.status === "success") {
-      msg.textContent = "✅ Submission successful!";
-      msg.style.background = "#d4edda";
-      msg.style.color = "#155724";
-      form.reset();
-    } else {
-      msg.textContent = "❌ Submission failed: " + (data.message || "");
-      msg.style.background = "#f8d7da";
-      msg.style.color = "#721c24";
-    }
-
-    msg.style.fontSize = "18px";
-    msg.style.fontFamily = "Arial, sans-serif";
-    msg.style.fontWeight = "bold";
-    msg.style.padding = "12px";
-    msg.style.marginBottom = "10px";
-    msg.style.border = "1px solid currentColor";
-    msg.style.borderRadius = "6px";
-    msg.style.textAlign = "center";
-
-    statusBar.appendChild(msg);
-  })
-  .catch(err => {
-    statusBar.innerHTML = "";
-    const msg = document.createElement("div");
-    msg.textContent = "❌ Submission failed: " + err;
-    msg.style.background = "#f8d7da";
-    msg.style.color = "#721c24";
-    msg.style.fontSize = "18px";
-    msg.style.fontFamily = "Arial, sans-serif";
-    msg.style.fontWeight = "bold";
-    msg.style.padding = "12px";
-    msg.style.marginBottom = "10px";
-    msg.style.border = "1px solid #721c24";
-    msg.style.borderRadius = "6px";
-    msg.style.textAlign = "center";
-
-    statusBar.appendChild(msg);
+    fetch(scriptURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(formData)})
+    .then(res=>res.json())
+    .then(data=>{
+      statusBar.innerHTML=""; const msg=document.createElement("div");
+      if(data.status==="success"){ msg.textContent="✅ Submission successful!"; msg.style.background="#d4edda"; msg.style.color="#155724"; form.reset();}
+      else{ msg.textContent="❌ Submission failed: "+(data.message||""); msg.style.background="#f8d7da"; msg.style.color="#721c24"; }
+      msg.style.fontSize="18px"; msg.style.fontFamily="Arial, sans-serif"; msg.style.fontWeight="bold";
+      msg.style.padding="12px"; msg.style.marginBottom="10px"; msg.style.border="1px solid currentColor";
+      msg.style.borderRadius="6px"; msg.style.textAlign="center"; statusBar.appendChild(msg);
+    })
+    .catch(err=>{
+      statusBar.innerHTML=""; const msg=document.createElement("div"); msg.textContent="❌ Submission failed: "+err;
+      msg.style.background="#f8d7da"; msg.style.color="#721c24"; msg.style.fontSize="18px"; msg.style.fontFamily="Arial, sans-serif";
+      msg.style.fontWeight="bold"; msg.style.padding="12px"; msg.style.marginBottom="10px"; msg.style.border="1px solid #721c24";
+      msg.style.borderRadius="6px"; msg.style.textAlign="center"; statusBar.appendChild(msg);
+    });
   });
+
 });
 </script>
