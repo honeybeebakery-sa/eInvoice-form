@@ -206,10 +206,11 @@ window.onload = function() {
         const submitBtn = form.querySelector('[type="submit"]');
         if (submitBtn) submitBtn.style.display = "none";
 
+        // Show validation warning (centered, styled)
         const msg = showMessage(
           "⚠️ Receipt already submitted after the 3rd date of the next month",
-          "#fff8c4",
-          "#d8000c"
+          "#fff8c4",  // light yellow
+          "#d8000c"   // red
         );
         form.parentNode.appendChild(msg);
       }
@@ -236,62 +237,38 @@ window.onload = function() {
   formatNumberSymbolsOnly(document.getElementById("contact"));
   ["address1","address2","address3"].forEach(id => formatUpperSingleSpace(document.getElementById(id)));
 
-// --- TIN & Classification Logic ---
-tinOption.addEventListener("change", function () {
-  if (this.checked) {
-    // ✅ Always override with N/A when ticked
-    tinInput.value = "N/A";
-    tinInput.disabled = true;
-  } else {
-    // ✅ Reset to classification logic when unticked
-    applyTINRules();
-  }
-});
+  // --- TIN & Classification Logic ---
+  const tinInput = document.getElementById("tinInput");
+  const tinOption = document.getElementById("tinOption");
+  const classification = document.getElementById("classification");
+  const tinLabel = document.getElementById("tinOptionLabel");
+  const tinSection = document.getElementById("tinSection");
+  const identitySection = document.getElementById("identitySection");
+  const brnSection = document.getElementById("brnSection");
+  const sstSection = document.getElementById("sstSection");
 
-// --- Classification change handling ---
-classification.addEventListener("change", function () {
-  if (!tinOption.checked) {
-    applyTINRules();
-  }
-});
+  tinOption.addEventListener("change", function(){
+    if(classification.value==="Business" && this.checked){ tinInput.value=""; tinInput.disabled=true; }
+    else if(classification.value==="Government" && this.checked){ tinInput.value="EI00000000040"; tinInput.disabled=true; }
+    else if(classification.value==="Individual" && this.checked){
+      const identityType = document.getElementById("identityType").value;
+      tinInput.value = identityType==="Passport" ? "EI00000000020" : "EI00000000010";
+      tinInput.disabled=true;
+    } else tinInput.disabled=false;
+  });
 
-// --- Identity Type change handling (IC ↔ Passport) ---
-document.getElementById("identityType").addEventListener("change", function () {
-  if (!tinOption.checked && classification.value === "Individual") {
-    applyTINRules();
-  }
-});
+  classification.addEventListener("change", function(){
+    tinSection.style.display="none"; identitySection.style.display="none"; brnSection.style.display="none"; sstSection.style.display="none";
+    if(this.value==="Business"){ tinSection.style.display="block"; tinLabel.innerText="N/A"; brnSection.style.display="block"; sstSection.style.display="block"; }
+    else if(this.value==="Government"){ tinSection.style.display="block"; tinLabel.innerText="General"; }
+    else if(this.value==="Individual"){ tinSection.style.display="block"; tinLabel.innerText="General"; identitySection.style.display="block"; }
+  });
 
-// --- Helper function for TIN autofill ---
-function applyTINRules() {
-  if (classification.value === "Business") {
-    tinInput.value = "";
-    tinInput.disabled = false;
-  } else if (classification.value === "Government") {
-    tinInput.value = "EI00000000040";
-    tinInput.disabled = true;
-  } else if (classification.value === "Individual") {
-    const identityType = document.getElementById("identityType").value;
-    tinInput.value =
-      identityType === "Passport" ? "EI00000000020" : "EI00000000010";
-    tinInput.disabled = true;
-  } else {
-    tinInput.value = "";
-    tinInput.disabled = false;
-  }
-}
-
-// --- SST N/A Handling ---
-document.getElementById("sstNA").addEventListener("change", function () {
-  const sst = document.getElementById("sst");
-  if (this.checked) {
-    sst.value = "N/A";
-    sst.disabled = true;
-  } else {
-    sst.value = "";
-    sst.disabled = false;
-  }
-});
+  document.getElementById("sstNA").addEventListener("change", function(){
+    const sst = document.getElementById("sst");
+    sst.disabled=this.checked;
+    if(this.checked) sst.value="";
+  });
 
   // --- Country/State Handling ---
   const country = document.getElementById("country");
@@ -370,4 +347,5 @@ document.getElementById("sstNA").addEventListener("change", function () {
 
 };
 </script>
+
 
