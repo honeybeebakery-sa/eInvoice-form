@@ -237,38 +237,80 @@ window.onload = function() {
   formatNumberSymbolsOnly(document.getElementById("contact"));
   ["address1","address2","address3"].forEach(id => formatUpperSingleSpace(document.getElementById(id)));
 
-  // --- TIN & Classification Logic ---
-  const tinInput = document.getElementById("tinInput");
-  const tinOption = document.getElementById("tinOption");
-  const classification = document.getElementById("classification");
-  const tinLabel = document.getElementById("tinOptionLabel");
-  const tinSection = document.getElementById("tinSection");
-  const identitySection = document.getElementById("identitySection");
-  const brnSection = document.getElementById("brnSection");
-  const sstSection = document.getElementById("sstSection");
-
-  tinOption.addEventListener("change", function(){
-    if(classification.value==="Business" && this.checked){ tinInput.value=""; tinInput.disabled=true; }
-    else if(classification.value==="Government" && this.checked){ tinInput.value="EI00000000040"; tinInput.disabled=true; }
-    else if(classification.value==="Individual" && this.checked){
+// --- TIN & Classification Logic ---
+tinOption.addEventListener("change", function () {
+  if (this.checked) {
+    // ✅ Always override with N/A when ticked
+    tinInput.value = "N/A";
+    tinInput.disabled = true;
+  } else {
+    // ✅ Follow classification rules when unticked
+    if (classification.value === "Business") {
+      tinInput.value = "";
+      tinInput.disabled = false;
+    } else if (classification.value === "Government") {
+      tinInput.value = "EI00000000040";
+      tinInput.disabled = true;
+    } else if (classification.value === "Individual") {
       const identityType = document.getElementById("identityType").value;
-      tinInput.value = identityType==="Passport" ? "EI00000000020" : "EI00000000010";
-      tinInput.disabled=true;
-    } else tinInput.disabled=false;
-  });
+      tinInput.value =
+        identityType === "Passport" ? "EI00000000020" : "EI00000000010";
+      tinInput.disabled = true;
+    } else {
+      tinInput.value = "";
+      tinInput.disabled = false;
+    }
+  }
+});
 
-  classification.addEventListener("change", function(){
-    tinSection.style.display="none"; identitySection.style.display="none"; brnSection.style.display="none"; sstSection.style.display="none";
-    if(this.value==="Business"){ tinSection.style.display="block"; tinLabel.innerText="N/A"; brnSection.style.display="block"; sstSection.style.display="block"; }
-    else if(this.value==="Government"){ tinSection.style.display="block"; tinLabel.innerText="General"; }
-    else if(this.value==="Individual"){ tinSection.style.display="block"; tinLabel.innerText="General"; identitySection.style.display="block"; }
-  });
+classification.addEventListener("change", function () {
+  tinSection.style.display = "none";
+  identitySection.style.display = "none";
+  brnSection.style.display = "none";
+  sstSection.style.display = "none";
 
-  document.getElementById("sstNA").addEventListener("change", function(){
-    const sst = document.getElementById("sst");
-    sst.disabled=this.checked;
-    if(this.checked) sst.value="";
-  });
+  if (this.value === "Business") {
+    tinSection.style.display = "block";
+    tinLabel.innerText = "N/A";
+    brnSection.style.display = "block";
+    sstSection.style.display = "block";
+  } else if (this.value === "Government") {
+    tinSection.style.display = "block";
+    tinLabel.innerText = "General";
+  } else if (this.value === "Individual") {
+    tinSection.style.display = "block";
+    tinLabel.innerText = "General";
+    identitySection.style.display = "block";
+  }
+
+  // ✅ Reapply TIN rules when classification changes
+  if (!tinOption.checked) {
+    if (this.value === "Government") {
+      tinInput.value = "EI00000000040";
+      tinInput.disabled = true;
+    } else if (this.value === "Individual") {
+      const identityType = document.getElementById("identityType").value;
+      tinInput.value =
+        identityType === "Passport" ? "EI00000000020" : "EI00000000010";
+      tinInput.disabled = true;
+    } else if (this.value === "Business") {
+      tinInput.value = "";
+      tinInput.disabled = false;
+    }
+  }
+});
+
+// --- SST N/A Handling ---
+document.getElementById("sstNA").addEventListener("change", function () {
+  const sst = document.getElementById("sst");
+  if (this.checked) {
+    sst.value = "N/A";   // ✅ send N/A instead of empty
+    sst.disabled = true;
+  } else {
+    sst.value = "";
+    sst.disabled = false;
+  }
+});
 
   // --- Country/State Handling ---
   const country = document.getElementById("country");
@@ -347,5 +389,6 @@ window.onload = function() {
 
 };
 </script>
+
 
 
