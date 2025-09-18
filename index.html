@@ -194,6 +194,10 @@ window.onload = function() {
 
 // --- Receipt Date Validation ---
 if (date) {
+  // Fill input field with slashes
+  document.getElementById("date").value = date.replace(/-/g, "/");
+
+  // Use original (with '-') for validation
   const [day, month, year] = date.split("-");
   const receiptDate = new Date(`${year}-${month}-${day}`);
   const nextMonth = new Date(receiptDate);
@@ -204,19 +208,16 @@ if (date) {
   if (today > cutoffDate) {
     const form = document.getElementById("invoiceForm");
     if (form) {
-      // Disable all form inputs
       [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
 
-      // Hide submit button
       const submitBtn = form.querySelector('[type="submit"]');
       if (submitBtn) submitBtn.style.display = "none";
 
-      // Show validation warning (styled, above form)
       const msg = document.createElement("div");
       msg.textContent = "⚠️ Receipt already submitted after the 3rd date of the next month";
-      msg.style.background = "#fff8c4";   // light yellow
-      msg.style.color = "#d8000c";        // red text
-      msg.style.fontSize = "18px";        // bigger text
+      msg.style.background = "#fff8c4";
+      msg.style.color = "#d8000c";
+      msg.style.fontSize = "18px";
       msg.style.fontFamily = "Arial, sans-serif";
       msg.style.fontWeight = "bold";
       msg.style.padding = "12px";
@@ -502,6 +503,7 @@ fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
 });
 
 </script>
+
 
 
 
