@@ -172,30 +172,41 @@ window.onload = function() {
     else if(receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
   }
 
-  // --- Receipt Date Validation ---
-  if(date){
-    const [day, month, year] = date.split("-");
-    const receiptDate = new Date(`${year}-${month}-${day}`);
-    const nextMonth = new Date(receiptDate); nextMonth.setMonth(nextMonth.getMonth() + 1);
-    const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
-    const today = new Date();
+// --- Receipt Date Validation ---
+if (date) {
+  const [day, month, year] = date.split("-");
+  const receiptDate = new Date(`${year}-${month}-${day}`);
+  const nextMonth = new Date(receiptDate);
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
+  const today = new Date();
 
-    if(today > cutoffDate){
-      const form = document.querySelector("form") || document.querySelector("div");
-      if(form){
-        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
-        const submitBtn = form.querySelector('[type="submit"]');
-        if(submitBtn) submitBtn.style.display = "none";
+  if (today > cutoffDate) {
+    const form = document.querySelector("form") || document.querySelector("div");
+    if (form) {
+      // Disable all inputs
+      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
 
-        const msg = document.createElement("div");
-        msg.innerText = "⚠️ Receipt already submitted after the 3rd date of the next month";
-        msg.style.color = "red";
-        msg.style.fontWeight = "bold";
-        msg.style.margin = "15px 0";
-        form.parentNode.insertBefore(msg, form);
-      }
+      const submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.style.display = "none";
+
+      // Validation message box
+      const msg = document.createElement("div");
+      msg.innerText = "⚠️ Receipt already submitted after the 3rd date of the next month";
+      msg.style.background = "#fff8c4";   // light yellow
+      msg.style.color = "#d8000c";        // red text
+      msg.style.padding = "12px";
+      msg.style.marginTop = "15px";
+      msg.style.border = "1px solid #f1c40f";
+      msg.style.borderRadius = "6px";
+      msg.style.fontWeight = "bold";
+      msg.style.fontSize = "14px";
+
+      // Append below the form
+      form.parentNode.appendChild(msg);
     }
   }
+}
 
   // --- Input Formatting Functions ---
   const formatUpperSingleSpace = el => el.addEventListener("input", function(){
@@ -331,6 +342,7 @@ form.addEventListener("submit", function(e){   // ✅ use submit listener instea
 
 };
 </script>
+
 
 
 
