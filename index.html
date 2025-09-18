@@ -49,37 +49,36 @@
     <option value="Government">Government</option>
   </select>
 
-  <!-- Dynamic Sections -->
-  <div id="identitySection" style="margin-bottom:15px;display:none;">
-    <label for="identityType">Identity:</label>
-    <select id="identityType" style="width:100%;margin-bottom:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-      <option value="">-- Select --</option>
-      <option value="MyKad">MyKad</option>
-      <option value="MyPR">MyPR</option>
-      <option value="MyKAS">MyKAS</option>
-      <option value="Army">Army</option>
-      <option value="Passport">Passport</option>
-    </select>
-    <input type="text" id="identityValue" placeholder="Identity No." style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-  </div>
-       
-  <div id="tinSection" style="margin-bottom:15px;display:none;">
-    <label for="tinInput">Tax Identification Number (TIN):</label><br>
-    <input type="checkbox" id="tinOption"> <span id="tinOptionLabel"></span>
-    <input type="text" id="tinInput" style="width:100%;margin-top:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-  </div>
+<!-- Dynamic Sections -->  
+<div id="identitySection" style="margin-bottom:15px;display:none;">
+  <label for="identityType">Identity:</label>
+  <select id="identityType" style="width:100%;margin-bottom:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <option value="">-- Select --</option>
+    <option value="MyKad">MyKad</option>
+    <option value="MyPR">MyPR</option>
+    <option value="MyKAS">MyKAS</option>
+    <option value="Army">Army</option>
+    <option value="Passport">Passport</option>
+  </select>
+  <input type="text" id="identityValue" placeholder="Identity No." style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+</div>
 
+<div id="tinSection" style="margin-bottom:15px;display:none;">
+  <label for="tinInput">Tax Identification Number (TIN):</label><br>
+  <input type="checkbox" id="tinOption"> <span id="tinOptionLabel"></span>
+  <input type="text" id="tinInput" style="width:100%;margin-top:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+</div>
 
-  <div id="brnSection" style="margin-bottom:15px;display:none;">
-    <label for="brn">Business Registration Number (BRN):</label>
-    <input type="text" id="brn" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-  </div>
+<div id="brnSection" style="margin-bottom:15px;display:none;">
+  <label for="brn">Business Registration Number (BRN):</label>
+  <input type="text" id="brn" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+</div>
 
-  <div id="sstSection" style="margin-bottom:15px;display:none;">
-    <label for="sst">SST Registration Number:</label><br>
-    <input type="checkbox" id="sstNA"> N/A
-    <input type="text" id="sst" style="width:calc(100% - 60px);margin-left:10px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-  </div>
+<div id="sstSection" style="margin-bottom:15px;display:none;">
+  <label for="sst">SST Registration Number:</label><br>
+  <input type="checkbox" id="sstNA"> N/A
+  <input type="text" id="sst" style="width:calc(100% - 60px);margin-left:10px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+</div>
 
   <label for="contact">Contact Number:</label>
   <input type="text" id="contact" required placeholder="e.g. 0123456789" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
@@ -238,68 +237,83 @@ window.onload = function() {
   formatNumberSymbolsOnly(document.getElementById("contact"));
   ["address1","address2","address3"].forEach(id => formatUpperSingleSpace(document.getElementById(id)));
 
-// --- TIN & Classification Logic ---
-tinOption.addEventListener("change", function () {
-  if (this.checked) {
-    // ✅ Always override with N/A when ticked
-    tinInput.value = "N/A";
-    tinInput.disabled = true;
-  } else {
-    // ✅ Follow classification rules when unticked
-    if (classification.value === "Business") {
-      tinInput.value = "";
-      tinInput.disabled = false;
-    } else if (classification.value === "Government") {
-      tinInput.value = "EI00000000040";
-      tinInput.disabled = true;
-    } else if (classification.value === "Individual") {
-      const identityType = document.getElementById("identityType").value;
-      tinInput.value =
-        identityType === "Passport" ? "EI00000000020" : "EI00000000010";
+  // --- Section References ---
+  const tinInput = document.getElementById("tinInput");
+  const tinOption = document.getElementById("tinOption");
+  const classification = document.getElementById("classification");
+  const tinLabel = document.getElementById("tinOptionLabel");
+  const tinSection = document.getElementById("tinSection");
+  const identitySection = document.getElementById("identitySection");
+  const brnSection = document.getElementById("brnSection");
+  const sstSection = document.getElementById("sstSection");
+
+  // --- TIN Checkbox Logic ---
+  tinOption.addEventListener("change", function () {
+    if (this.checked) {
+      // ✅ Always override with N/A when ticked
+      tinInput.value = "N/A";
       tinInput.disabled = true;
     } else {
-      tinInput.value = "";
-      tinInput.disabled = false;
+      // ✅ Follow classification rules when unticked
+      if (classification.value === "Business") {
+        tinInput.value = "";
+        tinInput.disabled = false;
+      } else if (classification.value === "Government") {
+        tinInput.value = "EI00000000040";
+        tinInput.disabled = true;
+      } else if (classification.value === "Individual") {
+        const identityType = document.getElementById("identityType").value;
+        tinInput.value =
+          identityType === "Passport" ? "EI00000000020" : "EI00000000010";
+        tinInput.disabled = true;
+      } else {
+        tinInput.value = "";
+        tinInput.disabled = false;
+      }
     }
-  }
-});
+  });
 
-classification.addEventListener("change", function () {
-  tinSection.style.display = "none";
-  identitySection.style.display = "none";
-  brnSection.style.display = "none";
-  sstSection.style.display = "none";
+  // --- Classification Change Logic (with Identity above TIN for Individual) ---
+  classification.addEventListener("change", function () {
+    tinSection.style.display = "none";
+    identitySection.style.display = "none";
+    brnSection.style.display = "none";
+    sstSection.style.display = "none";
 
-  if (this.value === "Business") {
-    tinSection.style.display = "block";
-    tinLabel.innerText = "N/A";
-    brnSection.style.display = "block";
-    sstSection.style.display = "block";
-  } else if (this.value === "Government") {
-    tinSection.style.display = "block";
-    tinLabel.innerText = "General";
-  } else if (this.value === "Individual") {
-    tinSection.style.display = "block";
-    tinLabel.innerText = "General";
-    identitySection.style.display = "block";
-  }
-
-  // ✅ Reapply TIN rules when classification changes
-  if (!tinOption.checked) {
-    if (this.value === "Government") {
-      tinInput.value = "EI00000000040";
-      tinInput.disabled = true;
+    if (this.value === "Business") {
+      tinSection.style.display = "block";
+      tinLabel.innerText = "N/A";
+      brnSection.style.display = "block";
+      sstSection.style.display = "block";
+    } else if (this.value === "Government") {
+      tinSection.style.display = "block";
+      tinLabel.innerText = "General";
     } else if (this.value === "Individual") {
-      const identityType = document.getElementById("identityType").value;
-      tinInput.value =
-        identityType === "Passport" ? "EI00000000020" : "EI00000000010";
-      tinInput.disabled = true;
-    } else if (this.value === "Business") {
-      tinInput.value = "";
-      tinInput.disabled = false;
+      // Show Identity first
+      identitySection.style.display = "block";
+      // Then show TIN below it
+      tinSection.style.display = "block";
+      tinLabel.innerText = "General";
+      // Move TIN section *after* identity in DOM if needed
+      identitySection.parentNode.insertBefore(identitySection, tinSection);
     }
-  }
-});
+
+    // ✅ Reapply TIN rules when classification changes
+    if (!tinOption.checked) {
+      if (this.value === "Government") {
+        tinInput.value = "EI00000000040";
+        tinInput.disabled = true;
+      } else if (this.value === "Individual") {
+        const identityType = document.getElementById("identityType").value;
+        tinInput.value =
+          identityType === "Passport" ? "EI00000000020" : "EI00000000010";
+        tinInput.disabled = true;
+      } else if (this.value === "Business") {
+        tinInput.value = "";
+        tinInput.disabled = false;
+      }
+    }
+  });
 
 // --- SST N/A Handling ---
 document.getElementById("sstNA").addEventListener("change", function () {
