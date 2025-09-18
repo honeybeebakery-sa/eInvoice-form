@@ -281,6 +281,14 @@ window.onload = function() {
     }
   });
 
+  // --- Toggle Required Attributes ---
+  function setRequired(el, isRequired) {
+    if (el) {
+      if (isRequired) el.setAttribute("required", "true");
+      else el.removeAttribute("required");
+    }
+  }
+
   // --- Classification Change Logic (with Identity above TIN for Individual) ---
   classification.addEventListener("change", function () {
     tinSection.style.display = "none";
@@ -288,27 +296,45 @@ window.onload = function() {
     brnSection.style.display = "none";
     sstSection.style.display = "none";
 
-    // Reset TIN state
+    // Reset required states
+    setRequired(tinInput, false);
+    setRequired(document.getElementById("identityType"), false);
+    setRequired(document.getElementById("identityValue"), false);
+    setRequired(document.getElementById("brn"), false);
+    setRequired(document.getElementById("sst"), false);
+
+    // Reset TIN
     tinOption.checked = false;
     tinInput.value = "";
     tinInput.disabled = false;
 
     if (this.value === "Business") {
       tinSection.style.display = "block";
-      tinLabel.innerText = "N/A"; // ✅ Business shows N/A
+      tinLabel.innerText = "N/A";
       brnSection.style.display = "block";
       sstSection.style.display = "block";
+
+      setRequired(tinInput, true);
+      setRequired(document.getElementById("brn"), true);
+      setRequired(document.getElementById("sst"), true);
+
     } else if (this.value === "Government") {
       tinSection.style.display = "block";
-      tinLabel.innerText = "General"; // ✅ Government shows General
+      tinLabel.innerText = "General";
+
+      setRequired(tinInput, true);
+
     } else if (this.value === "Individual") {
-      // Show Identity first
       identitySection.style.display = "block";
       tinSection.style.display = "block";
-      tinLabel.innerText = "General"; // ✅ Individual shows General
+      tinLabel.innerText = "General";
 
       // Place Identity before TIN
       identitySection.parentNode.insertBefore(identitySection, tinSection);
+
+      setRequired(document.getElementById("identityType"), true);
+      setRequired(document.getElementById("identityValue"), true);
+      setRequired(tinInput, true);
     }
   });
 
@@ -333,24 +359,29 @@ document.getElementById("sstNA").addEventListener("change", function () {
   }
 });
 
-  // --- Country/State Handling ---
-  const country = document.getElementById("country");
-  country.addEventListener("change", function(){
-    let stateContainer = document.getElementById("state");
-    if(this.value==="Malaysia"){
-      stateContainer.outerHTML = `<select id="state" style="width:100%;margin-bottom:10px;">
-        <option value="">-- Select --</option>
-        <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
-        <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
-        <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
-        <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
-        <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
-      </select>`;
-    } else {
-      stateContainer.outerHTML = '<input type="text" id="state" style="width:100%;margin-bottom:10px;" placeholder="Enter State">';
-      formatUpperSingleSpace(document.getElementById("state"));
-    }
-  });
+// --- Country/State Handling ---
+const country = document.getElementById("country");
+country.addEventListener("change", function () {
+  let stateContainer = document.getElementById("state");
+
+  if (this.value === "Malaysia") {
+    stateContainer.outerHTML = `<select id="state" style="width:100%;margin-bottom:10px;">
+      <option value="">-- Please select a state --</option>
+      <option value="Sarawak">Sarawak</option><option value="Sabah">Sabah</option><option value="Johor">Johor</option><option value="Kedah">Kedah</option>
+      <option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option>
+      <option value="Pahang">Pahang</option><option value="Penang">Penang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option>
+      <option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="Kuala Lumpur">Kuala Lumpur</option>
+      <option value="Putrajaya">Putrajaya</option><option value="Labuan">Labuan</option>
+    </select>`;
+  } else {
+    stateContainer.outerHTML = '<input type="text" id="state" style="width:100%;margin-bottom:10px;" placeholder="Enter state / province / region">';
+    formatUpperSingleSpace(document.getElementById("state"));
+  }
+
+  // Re-apply required with helper
+  let newState = document.getElementById("state");
+  setRequired(newState, true);
+});
 
   // --- Web App Submission ---
   const scriptURL = "https://script.google.com/macros/s/AKfycbwMO6DrWSS0LK9ZZ2AFB_0vsEh7vxquJXv0dkEIcYN67ffg1F_FRaTbAB43gONqEh8lCw/exec"; 
@@ -410,6 +441,7 @@ document.getElementById("sstNA").addEventListener("change", function () {
 
 };
 </script>
+
 
 
 
