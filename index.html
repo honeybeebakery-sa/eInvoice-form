@@ -164,32 +164,33 @@ window.onload = function() {
     msg.style.borderRadius = "8px";
     msg.style.fontWeight = "bold";
     msg.style.fontSize = "14px";
-    msg.style.textAlign = "center";   // center text
+    msg.style.textAlign = "center";
     msg.style.maxWidth = "600px";
-    msg.style.marginLeft = "auto";   // center box
+    msg.style.marginLeft = "auto";
     msg.style.marginRight = "auto";
     return msg;
   }
 
   // --- URL Parameters & Autofill ---
   const params = new URLSearchParams(window.location.search);
-  const dateParam = params.get("date");
-  const receiptParam = params.get("receipt");
-  const totalParam = params.get("total");
-
-  const date = dateParam ? decodeURIComponent(dateParam) : null;
-  const receipt = receiptParam ? decodeURIComponent(receiptParam) : null;
-  const total = totalParam ? decodeURIComponent(totalParam) : null;
+  const date = params.get("date");
+  const receipt = params.get("receipt");
+  const total = params.get("total");
 
   if (date) document.getElementById("date").value = date.replace(/-/g, "/");
   if (receipt) document.getElementById("invoice").value = receipt;
   if (total) document.getElementById("amount").value = "RM " + total;
 
+  // Terminal auto-select
   const terminalSelect = document.getElementById("terminal");
   if (receipt) {
-    if (receipt.includes("T01")) terminalSelect.value = "T-01 (Pasar Counter 1)";
-    else if (receipt.includes("T02")) terminalSelect.value = "T-02 (Pasar Counter 2)";
-    else if (receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
+    if (/T01/i.test(receipt)) {
+      terminalSelect.value = "T-01 (Pasar Counter 1)";
+    } else if (/T02/i.test(receipt)) {
+      terminalSelect.value = "T-02 (Pasar Counter 2)";
+    } else if (/T04/i.test(receipt)) {
+      terminalSelect.value = "T-01 (Lian Yi Counter)";
+    }
   }
 
 // --- Receipt Date Validation ---
@@ -503,6 +504,7 @@ fetch(scriptURL, { method: "POST", body: JSON.stringify(formData) })
 });
 
 </script>
+
 
 
 
