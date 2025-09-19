@@ -144,6 +144,8 @@
     <button type="submit" style="width:100%;padding:14px;background:#4a2f00;color:#fff;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.3s;">
       Submit
     </button>
+<div id="formStatus" style="margin-top:12px;font-weight:bold;color:#444;"></div>
+
 
   </form>
 </div>
@@ -240,6 +242,39 @@ window.onload = function() {
   document.getElementById("postcode").addEventListener("input", function(){
     this.value = this.value.replace(/\D/g,"");
   });
+
+const formStatus = document.getElementById("formStatus");
+
+form.addEventListener("submit", function(e){
+  formStatus.innerText = ""; // clear previous messages
+
+  // Stop submission if form is disabled
+  if(formDisabled){
+    formStatus.innerText = "⚠️ Form cannot be submitted: receipt is past cutoff date.";
+    formStatus.style.color = "#d8000c";
+    e.preventDefault();
+    return;
+  }
+
+  // Required fields check
+  let missingFields = [];
+  [...form.querySelectorAll("input[required], select[required], textarea[required]")].forEach(el => {
+    if(!el.value) missingFields.push(el.id);
+  });
+
+  if(missingFields.length > 0){
+    formStatus.innerText = "⚠️ Please fill all required fields.";
+    formStatus.style.color = "#d8000c";
+    e.preventDefault();
+    return;
+  }
+
+  // Show submitting message
+  formStatus.innerText = "Submitting form...";
+  formStatus.style.color = "#5bc0de";
+
+  // Let the form submit normally to your Google Sheet Web App
+});
 
   // --------------------------
   // TIN Section
