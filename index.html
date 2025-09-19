@@ -1,3 +1,46 @@
+<style>
+/* Make form container responsive */
+@media (max-width: 768px) {
+  div[style*="max-width:800px"] {
+    max-width: 95% !important;
+    margin: 20px auto !important;
+    padding: 20px !important;
+  }
+
+  /* Reduce font sizes for small screens */
+  h2 { font-size: 18px !important; }
+  h3 { font-size: 16px !important; }
+  input, select, textarea, button {
+    padding: 6px !important;
+    font-size: 14px !important;
+  }
+
+  button {
+    font-size: 14px !important;
+    padding: 12px !important;
+  }
+
+  /* Stack side-by-side fields vertically */
+  .flex, .flex-wrap {
+    flex-direction: column !important;
+  }
+
+  .flex > div {
+    min-width: 100% !important;
+  }
+
+  /* Fix SST input + N/A checkbox on mobile */
+  #sst {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 5px !important;
+  }
+  #sstNA {
+    margin-top: 10px !important;
+  }
+}
+</style>
+
 <div style="max-width:800px;margin:40px auto;padding:30px;background:#f8f3e9;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1);font-family:Arial,sans-serif;line-height:1.6;color:#333;">
 
   <form id="eInvoiceForm" action="https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec" method="POST">
@@ -144,12 +187,10 @@
     <button type="submit" style="width:100%;padding:14px;background:#4a2f00;color:#fff;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.3s;">
       Submit
     </button>
-<div id="formStatus" style="margin-top:12px;font-weight:bold;color:#444;"></div>
-
+    <div id="formStatus" style="margin-top:12px;font-weight:bold;color:#444;"></div>
 
   </form>
 </div>
-
 
 <script>
 window.onload = function() {
@@ -411,5 +452,6 @@ if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.check
   });
 };
 </script>
+
 
 
