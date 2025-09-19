@@ -264,7 +264,7 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e){
   status.innerText = 'Submitting...';
 
   const data = Object.fromEntries(new FormData(this).entries());
-  const SCRIPT_URL = 'PASTE_YOUR_WEB_APP_URL_HERE'; // replace with your Web App URL
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbythXqvx2xRHGq4lU_33a9XrjXflrBfIDkua90t8rnrNB1vIcCJrakh7m_NllT1YU53/exec'; // replace with your Web App URL
 
   fetch(SCRIPT_URL, { 
     method: 'POST', 
@@ -295,4 +295,5 @@ window.onload = prefillFields;
 </script>
 </body>
 </html>
+
 
