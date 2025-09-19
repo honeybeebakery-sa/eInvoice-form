@@ -600,6 +600,42 @@ if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.check
   missingFields.push("sst");
 }
 
+// TIN required if visible
+const tinSection = document.getElementById("tinSection");
+const tinInput = document.getElementById("tinInput");
+const tinCheckboxes = tinSection.querySelectorAll(".tinCheckbox");
+
+if(tinSection && tinSection.style.display !== "none"){
+  // Require either checkbox selected OR manual input filled
+  const checkboxChecked = [...tinCheckboxes].some(cb => cb.checked);
+  const tinFilled = tinInput && tinInput.value.trim() !== "";
+  if(!checkboxChecked && !tinFilled){
+    missingFields.push("tin"); // will trigger "Please fill all required fields"
+  }
+}
+
+// Identity required if visible
+const identitySection = document.getElementById("identitySection");
+const identityType = document.getElementById("identityType");
+const identityValue = document.getElementById("identityValue");
+
+if(identitySection && identitySection.style.display !== "none"){
+  if(!identityType.value.trim() || !identityValue.value.trim()){
+    missingFields.push("identity"); // triggers "Please fill all required fields"
+  }
+}
+
+// Receipt Information required if visible
+const dateEl = document.getElementById("date");
+const invoiceEl = document.getElementById("invoice");
+const amountEl = document.getElementById("amount");
+const terminalEl = document.getElementById("terminal");
+
+if(dateEl && dateEl.offsetParent !== null && !dateEl.value.trim()) missingFields.push("date");
+if(invoiceEl && invoiceEl.offsetParent !== null && !invoiceEl.value.trim()) missingFields.push("invoice");
+if(amountEl && amountEl.offsetParent !== null && !amountEl.value.trim()) missingFields.push("amount");
+if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) missingFields.push("terminal");
+
     if(missingFields.length > 0){
       formStatus.innerText = "⚠️ Please fill all required fields.";
       formStatus.style.color = "#d8000c";
@@ -632,13 +668,3 @@ if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.check
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
