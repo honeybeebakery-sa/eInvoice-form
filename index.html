@@ -262,8 +262,10 @@ window.onload = function() {
   const classification = document.getElementById("classification");
   const tinCheckboxes = tinSection.querySelectorAll(".tinCheckbox");
 
-  tinInput.style.resize = "none";
-  formatUpperSingleSpace(tinInput);
+// keep textarea tidy
+tinInput.style.resize = "none";
+formatUpperSingleSpace(tinInput); 
+tinInput.readOnly = false; // allow typing initially
 
   tinCheckboxes.forEach(cb => {
     cb.addEventListener("change", function(){
@@ -274,7 +276,7 @@ window.onload = function() {
       } else {
         if(![...tinCheckboxes].some(c => c.checked)){
           tinInput.value = "";
-          tinInput.disabled = false;
+          tinInput.readOnly = false;
         }
       }
     });
@@ -427,6 +429,7 @@ if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.check
 </script>
 </body>
 </html>
+
 
 
 
