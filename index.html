@@ -270,7 +270,7 @@ window.onload = function() {
       if(this.checked){
         tinCheckboxes.forEach(other => { if(other!==this) other.checked=false; });
         tinInput.value = this.value;
-        tinInput.disabled = true;
+        tinInput.readOnly = true;
       } else {
         if(![...tinCheckboxes].some(c => c.checked)){
           tinInput.value = "";
@@ -427,6 +427,7 @@ if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.check
 </script>
 </body>
 </html>
+
 
 
 
