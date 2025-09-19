@@ -163,16 +163,13 @@
       <label><input type="checkbox" id="clarification"> I confirm the above information is correct</label>
     </div>
 
-    <!-- Centered Submit Button -->
     <button type="submit">Submit</button>
   </form>
 
-  <!-- Status Box -->
   <div class="status-box" id="statusBox"></div>
 </div>
 
 <script>
-// ---------------- Utility Functions ----------------
 function formatUppercase(el){ el.value = el.value.replace(/\s+/g,' ').toUpperCase(); }
 function formatLowercaseNoSpace(el){ el.value = el.value.replace(/\s+/g,'').toLowerCase(); }
 function formatUppercaseNoSpace(el){ el.value = el.value.replace(/\s+/g,'').toUpperCase(); }
@@ -260,33 +257,31 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e){
   e.preventDefault();
   const status = document.getElementById('statusBox');
   status.style.display = 'block';
-  status.className = 'status-box status-blue';
-  status.innerText = 'Submitting...';
+  status.className='status-box status-blue';
+  status.innerText='Submitting...';
 
   const data = Object.fromEntries(new FormData(this).entries());
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbythXqvx2xRHGq4lU_33a9XrjXflrBfIDkua90t8rnrNB1vIcCJrakh7m_NllT1YU53/exec'; // replace with your Web App URL
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_Qwi7ouKHyVwh6ekvC5HTqX7w-oymnPu2M4t5UR4VFOIdIsQI2yXBOA2RFr_qDSPI/exec'; // <-- Replace with your deployed Web App URL
 
   fetch(SCRIPT_URL, { 
     method: 'POST', 
     body: JSON.stringify(data), 
-    headers: {'Content-Type': 'application/json'} 
+    headers:{'Content-Type':'application/json'} 
   })
-  .then(resp => resp.json())
+  .then(resp => resp.json()) // parse JSON
   .then(json => {
     if(json.status === 'success'){
-      status.className = 'status-box status-green';
-      status.innerText = 'Submitted Successfully';
+      status.className='status-box status-green';
+      status.innerText='Submitted Successfully';
       this.reset();
     } else {
-      status.className = 'status-box status-red';
-      status.innerText = 'Failed to Submit: ' + (json.message || 'Unknown error');
-      console.error('Error details:', json.message);
+      status.className='status-box status-red';
+      status.innerText='Failed to Submit: ' + (json.message || '');
     }
   })
   .catch(err => {
-    status.className = 'status-box status-red';
-    status.innerText = 'Failed to Submit: ' + err.message;
-    console.error('Fetch error:', err);
+    status.className='status-box status-red';
+    status.innerText='Failed to Submit: ' + err.message;
   });
 });
 
