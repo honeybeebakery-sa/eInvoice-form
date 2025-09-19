@@ -259,29 +259,34 @@ function prefillFields(){
 document.getElementById('invoiceForm').addEventListener('submit', function(e){
   e.preventDefault();
   const status = document.getElementById('statusBox');
-  status.style.display='block';
-  status.className='status-box status-blue';
-  status.innerText='Submitting...';
+  status.style.display = 'block';
+  status.className = 'status-box status-blue';
+  status.innerText = 'Submitting...';
 
   const data = Object.fromEntries(new FormData(this).entries());
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzhPIKAqmTlCKAx5bOVDTlkMtxOI3xHqU9lM8l0S_K_WgvlCAPJCcjZQcVUvpYBGO2/exec'; // Replace with your Google Apps Script Web App URL
+  const SCRIPT_URL = 'PASTE_YOUR_WEB_APP_URL_HERE'; // replace with your Web App URL
 
   fetch(SCRIPT_URL, { 
     method: 'POST', 
     body: JSON.stringify(data), 
-    headers:{'Content-Type':'application/json'} 
+    headers: {'Content-Type': 'application/json'} 
   })
-  .then(resp=>{
-    if(resp.ok){
-      status.className='status-box status-green';
-      status.innerText='Submitted Successfully';
+  .then(resp => resp.json())
+  .then(json => {
+    if(json.status === 'success'){
+      status.className = 'status-box status-green';
+      status.innerText = 'Submitted Successfully';
       this.reset();
-    } else throw new Error('Failed');
+    } else {
+      status.className = 'status-box status-red';
+      status.innerText = 'Failed to Submit: ' + (json.message || 'Unknown error');
+      console.error('Error details:', json.message);
+    }
   })
-  .catch(err=>{
-    status.className='status-box status-red';
-    status.innerText='Failed to Submit';
-    console.error(err);
+  .catch(err => {
+    status.className = 'status-box status-red';
+    status.innerText = 'Failed to Submit: ' + err.message;
+    console.error('Fetch error:', err);
   });
 });
 
@@ -290,3 +295,4 @@ window.onload = prefillFields;
 </script>
 </body>
 </html>
+
