@@ -373,15 +373,16 @@ if(brnSection && brnSection.style.display !== "none" && brnField && !brnField.va
   missingFields.push("brn");
 }
 
+// SST required if visible and N/A not checked
+const sstField = document.getElementById("sst");
+const sstNA = document.getElementById("sstNA");
+const sstSection = document.getElementById("sstSection");
+if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.checked && !sstField.value.trim()){
+  missingFields.push("sst");
+}
+
     if(missingFields.length > 0){
       formStatus.innerText = "⚠️ Please fill all required fields.";
-      formStatus.style.color = "#d8000c";
-      return;
-    }
-
-    // SST field required only if not N/A
-    if(sstInput && !sstNA.checked && !sstInput.value.trim()){
-      formStatus.innerText = "⚠️ Please fill SST Registration Number or select N/A.";
       formStatus.style.color = "#d8000c";
       return;
     }
@@ -410,4 +411,5 @@ if(brnSection && brnSection.style.display !== "none" && brnField && !brnField.va
   });
 };
 </script>
+
 
