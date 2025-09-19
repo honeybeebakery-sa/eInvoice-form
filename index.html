@@ -391,14 +391,15 @@ if(missingFields.length > 0){
     const SHEET_URL = "https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec"; // <-- replace with your deployed Apps Script URL
 
     fetch(SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(formData)
-    })
-    .then(() => alert("Form submitted successfully!"))
-    .catch(err => alert("Error submitting form: " + err));
+  method: "POST",
+  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  body: new URLSearchParams(formData)
+})
+.then(res => res.json())
+.then(data => alert("Form submitted successfully!"))
+.catch(err => alert("Error submitting form: " + err));
   });
 
 };
 </script>
+
