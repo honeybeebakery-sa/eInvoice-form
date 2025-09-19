@@ -261,7 +261,7 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e){
   status.innerText='Submitting...';
 
   const data = Object.fromEntries(new FormData(this).entries());
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_Qwi7ouKHyVwh6ekvC5HTqX7w-oymnPu2M4t5UR4VFOIdIsQI2yXBOA2RFr_qDSPI/exec'; // <-- Replace with your deployed Web App URL
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsIHd1Tz3I91Xr0OHM4u_MJrVZB2Pypv0Ze3HvPoL6eJZeW_wahRlzGInsMt4kyT4B/exec'; // <-- Replace with your deployed Web App URL
 
   fetch(SCRIPT_URL, { 
     method: 'POST', 
@@ -290,5 +290,6 @@ window.onload = prefillFields;
 </script>
 </body>
 </html>
+
 
 
