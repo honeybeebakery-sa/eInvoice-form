@@ -1,6 +1,6 @@
 <div style="max-width:800px;margin:40px auto;padding:30px;background:#f8f3e9;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1);font-family:Arial,sans-serif;line-height:1.6;color:#333;">
 
-  <form id="eInvoiceForm" action="https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec" method="POST" target="_blank">
+  <form id="eInvoiceForm" action="https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec" method="POST">
 
     <!-- Logo + Title -->
     <div style="text-align:center;margin-bottom:25px;">
@@ -165,7 +165,7 @@ window.onload = function() {
   const receipt = receiptParam ? decodeURIComponent(receiptParam) : "";
   const total = totalParam ? decodeURIComponent(totalParam) : "";
 
-  // Autofill receipt details (readonly, not disabled)
+  // Autofill receipt details (readonly)
   const dateEl = document.getElementById("date");
   const invoiceEl = document.getElementById("invoice");
   const amountEl = document.getElementById("amount");
@@ -197,9 +197,7 @@ window.onload = function() {
 
     if(today > cutoffDate){
       formDisabled = true;
-      if(form){
-        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
-      }
+      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
 
       const msgBox = document.createElement("div");
       msgBox.innerText = "⚠️ Receipt Submitted after 3rd date on new month";
@@ -228,7 +226,6 @@ window.onload = function() {
     this.value = this.value.replace(/[^0-9+()-]/g,"");
   });
 
-  // Apply formatting
   formatUpperSingleSpace(document.getElementById("name"));
   formatLowerNoSpace(document.getElementById("email"));
   formatUpperSingleSpace(document.getElementById("identityValue"));
@@ -243,41 +240,8 @@ window.onload = function() {
     this.value = this.value.replace(/\D/g,"");
   });
 
-const formStatus = document.getElementById("formStatus");
-
-form.addEventListener("submit", function(e){
-  formStatus.innerText = ""; // clear previous messages
-
-  // Stop submission if form is disabled
-  if(formDisabled){
-    formStatus.innerText = "⚠️ Form cannot be submitted: receipt is past cutoff date.";
-    formStatus.style.color = "#d8000c";
-    e.preventDefault();
-    return;
-  }
-
-  // Required fields check
-  let missingFields = [];
-  [...form.querySelectorAll("input[required], select[required], textarea[required]")].forEach(el => {
-    if(!el.value) missingFields.push(el.id);
-  });
-
-  if(missingFields.length > 0){
-    formStatus.innerText = "⚠️ Please fill all required fields.";
-    formStatus.style.color = "#d8000c";
-    e.preventDefault();
-    return;
-  }
-
-  // Show submitting message
-  formStatus.innerText = "Submitting form...";
-  formStatus.style.color = "#5bc0de";
-
-  // Let the form submit normally to your Google Sheet Web App
-});
-
   // --------------------------
-  // TIN Section
+  // TIN & Classification
   // --------------------------
   const tinInput = document.getElementById("tinInput");
   const tinSection = document.getElementById("tinSection");
@@ -306,7 +270,9 @@ form.addEventListener("submit", function(e){
     const identitySection = document.getElementById("identitySection");
     const brnSection = document.getElementById("brnSection");
     const sstSection = document.getElementById("sstSection");
+    const sstNA = document.getElementById("sstNA");
 
+    // Reset all sections
     tinSection.style.display = "none";
     identitySection.style.display = "none";
     brnSection.style.display = "none";
@@ -315,6 +281,7 @@ form.addEventListener("submit", function(e){
     tinInput.value = "";
     tinInput.disabled = false;
     tinCheckboxes.forEach(c => c.checked = false);
+    if(sstNA) sstNA.checked = false;
 
     if(this.value==="Business"){
       tinSection.style.display="block";
@@ -327,6 +294,20 @@ form.addEventListener("submit", function(e){
       identitySection.style.display="block";
     }
   });
+
+  // SST N/A logic
+  const sstInput = document.getElementById("sst");
+  const sstNA = document.getElementById("sstNA");
+  if(sstNA && sstInput){
+    sstNA.addEventListener("change", function(){
+      if(this.checked){
+        sstInput.disabled = true;
+        sstInput.value = "";
+      } else {
+        sstInput.disabled = false;
+      }
+    });
+  }
 
   // --------------------------
   // State / Country logic
@@ -358,6 +339,67 @@ form.addEventListener("submit", function(e){
     } else {
       stateContainer.outerHTML = '<input type="text" id="state" style="width:100%;margin-bottom:10px;" placeholder="Enter State">';
     }
+  });
+
+  // --------------------------
+  // Form submission
+  // --------------------------
+  const formStatus = document.getElementById("formStatus");
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault(); // prevent default
+
+    formStatus.innerText = ""; // clear previous
+    formStatus.style.color = "#5bc0de";
+
+    // Stop if form disabled
+    if(formDisabled){
+      formStatus.innerText = "⚠️ Form cannot be submitted: receipt is past cutoff date.";
+      formStatus.style.color = "#d8000c";
+      return;
+    }
+
+    // Required fields check (only visible sections)
+    let missingFields = [];
+    const requiredFields = form.querySelectorAll("input[required], select[required], textarea[required]");
+    requiredFields.forEach(el => {
+      if(el.offsetParent !== null && !el.value.trim()) missingFields.push(el.id);
+    });
+
+    if(missingFields.length > 0){
+      formStatus.innerText = "⚠️ Please fill all required fields.";
+      formStatus.style.color = "#d8000c";
+      return;
+    }
+
+    // SST field required only if not N/A
+    if(sstInput && !sstNA.checked && !sstInput.value.trim()){
+      formStatus.innerText = "⚠️ Please fill SST Registration Number or select N/A.";
+      formStatus.style.color = "#d8000c";
+      return;
+    }
+
+    // Show submitting
+    formStatus.innerText = "Submitting form...";
+    formStatus.style.color = "#5bc0de";
+
+    const formData = new FormData(form);
+    fetch(form.action, { method: "POST", body: formData })
+      .then(response => {
+        if(response.ok){
+          formStatus.innerText = "✅ Form submitted successfully!";
+          formStatus.style.color = "#28a745";
+          form.reset();
+        } else {
+          formStatus.innerText = "⚠️ Submission failed. Please try again.";
+          formStatus.style.color = "#d8000c";
+        }
+      })
+      .catch(err => {
+        formStatus.innerText = "⚠️ Submission error. Please check your connection.";
+        formStatus.style.color = "#d8000c";
+      });
+
   });
 };
 </script>
