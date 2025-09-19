@@ -366,6 +366,13 @@ window.onload = function() {
       if(el.offsetParent !== null && !el.value.trim()) missingFields.push(el.id);
     });
 
+// BRN required if visible
+const brnField = document.getElementById("brn");
+const brnSection = document.getElementById("brnSection");
+if(brnSection && brnSection.style.display !== "none" && brnField && !brnField.value.trim()){
+  missingFields.push("brn");
+}
+
     if(missingFields.length > 0){
       formStatus.innerText = "⚠️ Please fill all required fields.";
       formStatus.style.color = "#d8000c";
@@ -403,3 +410,4 @@ window.onload = function() {
   });
 };
 </script>
+
