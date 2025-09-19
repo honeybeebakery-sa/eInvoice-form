@@ -1,152 +1,151 @@
 <div style="max-width:800px;margin:40px auto;padding:30px;background:#f8f3e9;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1);font-family:Arial,sans-serif;line-height:1.6;color:#333;">
-  
-  <!-- Logo + Title -->
-  <div style="text-align:center;margin-bottom:25px;">
-    <img src="https://i.imgur.com/0lppOV5.png" alt="HONEYBITES Logo" style="max-width:150px;margin-bottom:15px;">
-    <h2 style="font-size:22px;color:#222;line-height:1.4;margin:0;">
-      HONEYBITES BAKERY SDN BHD
-    </h2>
-    <span style="font-size:18px;color:#444;">E-Invoice Request Application</span>
-  </div>
 
-  <!-- Receipt Info -->
-  <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">📄 Receipt Information</h3>
-  
-  <label for="date">Date:</label>
-  <input type="text" id="date" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+  <form id="eInvoiceForm" action="https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec" method="POST" target="_blank">
 
-  <label for="invoice">Invoice No.:</label>
-  <input type="text" id="invoice" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <!-- Logo + Title -->
+    <div style="text-align:center;margin-bottom:25px;">
+      <img src="https://i.imgur.com/0lppOV5.png" alt="HONEYBITES Logo" style="max-width:150px;margin-bottom:15px;">
+      <h2 style="font-size:22px;color:#222;line-height:1.4;margin:0;">
+        HONEYBITES BAKERY SDN BHD
+      </h2>
+      <span style="font-size:18px;color:#444;">E-Invoice Request Application</span>
+    </div>
 
-  <label for="amount">Amount:</label>
-  <input type="text" id="amount" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <!-- Receipt Info -->
+    <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">📄 Receipt Information</h3>
 
-  <label for="terminal">Cashier Terminal:</label>
-  <select id="terminal" disabled style="width:100%;margin-bottom:20px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-    <option value="">-- Auto Selected --</option>
-    <option value="T-01 (Pasar Counter 1)">T-01 (Pasar Counter 1)</option>
-    <option value="T-02 (Pasar Counter 2)">T-02 (Pasar Counter 2)</option>
-    <option value="T-01 (Lian Yi Counter)">T-01 (Lian Yi Counter)</option>
-  </select>
+    <label for="date">Date:</label>
+    <input type="text" id="date" name="date" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
 
-  <!-- Buyer Info -->
-  <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">🧾 Buyer Information</h3>
+    <label for="invoice">Invoice No.:</label>
+    <input type="text" id="invoice" name="invoice" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
 
-  <label for="name">Name:</label>
-  <input type="text" id="name" required placeholder="FULL NAME" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <label for="amount">Amount:</label>
+    <input type="text" id="amount" name="amount" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
 
-  <label for="email">Email:</label>
-  <input type="email" id="email" required placeholder="example@mail.com" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <label for="terminal">Cashier Terminal:</label>
+    <input type="text" id="terminal" name="terminal" readonly style="width:100%;margin-bottom:20px;padding:8px;border:1px solid #ccc;border-radius:6px;">
 
-  <label for="classification">Classification:</label>
-  <select id="classification" required style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-    <option value="">-- Select --</option>
-    <option value="Individual">Individual</option>
-    <option value="Business">Business</option>
-    <option value="Government">Government</option>
-  </select>
+    <!-- Buyer Info -->
+    <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">🧾 Buyer Information</h3>
 
-  <!-- Dynamic Sections -->
-<div id="tinSection" style="margin-bottom:15px;display:none;">
-  <label style="font-weight:600;">Tax Identification Number (TIN): <span style="color:red">*</span></label>
-  <div style="display:flex;flex-direction:column;gap:8px;margin-top:5px;">
-    <label><input type="checkbox" class="tinCheckbox" value="EI00000000010"> EI00000000010 (Malaysian Citizen)</label>
-    <label><input type="checkbox" class="tinCheckbox" value="EI00000000020"> EI00000000020 (Non-Malaysian)</label>
-    <label><input type="checkbox" class="tinCheckbox" value="EI00000000040"> EI00000000040 (Government)</label>
-  </div>
-  <textarea id="tinInput" placeholder="Enter TIN manually" 
-            style="width:100%;margin-top:8px;padding:8px;border:1px solid #ccc;border-radius:6px; resize: none;"></textarea>
-</div>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required placeholder="FULL NAME" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
 
-  <div id="identitySection" style="margin-bottom:15px;display:none;">
-    <label for="identityType">Identity:</label>
-    <select id="identityType" style="width:100%;margin-bottom:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required placeholder="example@mail.com" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+
+    <label for="classification">Classification:</label>
+    <select id="classification" name="classification" required style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
       <option value="">-- Select --</option>
-      <option value="MyKad">MyKad</option>
-      <option value="MyPR">MyPR</option>
-      <option value="MyKAS">MyKAS</option>
-      <option value="Army">Army</option>
-      <option value="Passport">Passport</option>
+      <option value="Individual">Individual</option>
+      <option value="Business">Business</option>
+      <option value="Government">Government</option>
     </select>
-    <input type="text" id="identityValue" placeholder="Identity No." style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-  </div>
 
-  <div id="brnSection" style="margin-bottom:15px;display:none;">
-    <label for="brn">Business Registration Number (BRN):</label>
-    <input type="text" id="brn" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-  </div>
-
-  <div id="sstSection" style="margin-bottom:15px;display:none;">
-    <label for="sst">SST Registration Number:</label><br>
-    <input type="checkbox" id="sstNA"> N/A
-    <input type="text" id="sst" style="width:calc(100% - 60px);margin-left:10px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-  </div>
-
-  <label for="contact">Contact Number:</label>
-  <input type="text" id="contact" required placeholder="e.g. 0123456789" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-  <!-- Address Section (Fixed Size) -->
-  <label>Address:</label>
-  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:15px;">
-    <textarea id="address1" required placeholder="Address Line 1" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
-    <textarea id="address2" placeholder="Address Line 2" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
-    <textarea id="address3" placeholder="Address Line 3" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
-  </div>
-
-  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
-    <div style="flex:1;min-width:120px;">
-      <label>Postcode:</label>
-      <input type="number" id="postcode" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <!-- Dynamic Sections -->
+    <div id="tinSection" style="margin-bottom:15px;display:none;">
+      <label style="font-weight:600;">Tax Identification Number (TIN): <span style="color:red">*</span></label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:5px;">
+        <label><input type="checkbox" class="tinCheckbox" value="EI00000000010"> EI00000000010 (Malaysian Citizen)</label>
+        <label><input type="checkbox" class="tinCheckbox" value="EI00000000020"> EI00000000020 (Non-Malaysian)</label>
+        <label><input type="checkbox" class="tinCheckbox" value="EI00000000040"> EI00000000040 (Government)</label>
+      </div>
+      <textarea id="tinInput" name="tinInput" placeholder="Enter TIN manually" 
+                style="width:100%;margin-top:8px;padding:8px;border:1px solid #ccc;border-radius:6px; resize: none;"></textarea>
     </div>
-    <div style="flex:2;min-width:200px;">
-      <label>City:</label>
-      <input type="text" id="city" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-    </div>
-  </div>
 
-  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
-    <div style="flex:1;min-width:180px;">
-      <label>State:</label>
-      <select id="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    <div id="identitySection" style="margin-bottom:15px;display:none;">
+      <label for="identityType">Identity:</label>
+      <select id="identityType" name="identityType" style="width:100%;margin-bottom:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
         <option value="">-- Select --</option>
-        <option value="Sarawak">Sarawak</option>
-        <option value="Sabah">Sabah</option>
-        <option value="Johor">Johor</option>
-        <option value="Kedah">Kedah</option>
-        <option value="Kelantan">Kelantan</option>
-        <option value="Melaka">Melaka</option>
-        <option value="Negeri Sembilan">Negeri Sembilan</option>
-        <option value="Pahang">Pahang</option>
-        <option value="Penang">Penang</option>
-        <option value="Perak">Perak</option>
-        <option value="Perlis">Perlis</option>
-        <option value="Selangor">Selangor</option>
-        <option value="Terengganu">Terengganu</option>
-        <option value="Kuala Lumpur">Kuala Lumpur</option>
-        <option value="Putrajaya">Putrajaya</option>
-        <option value="Labuan">Labuan</option>
+        <option value="MyKad">MyKad</option>
+        <option value="MyPR">MyPR</option>
+        <option value="MyKAS">MyKAS</option>
+        <option value="Army">Army</option>
+        <option value="Passport">Passport</option>
       </select>
+      <input type="text" id="identityValue" name="identityValue" placeholder="Identity No." style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
     </div>
-    <div style="flex:1;min-width:180px;">
-      <label>Country:</label>
-      <select id="country" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-        <option value="Malaysia">Malaysia</option>
-        <option value="Other">Other</option>
-      </select>
+
+    <div id="brnSection" style="margin-bottom:15px;display:none;">
+      <label for="brn">Business Registration Number (BRN):</label>
+      <input type="text" id="brn" name="brn" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
     </div>
-  </div>
 
-  <!-- Clarification -->
-  <div style="margin:15px 0;">
-    <label style="font-size:14px;color:#444;">
-      <input type="checkbox" id="confirm" required> I confirm that the above information is correct.
-    </label>
-  </div>
+    <div id="sstSection" style="margin-bottom:15px;display:none;">
+      <label for="sst">SST Registration Number:</label><br>
+      <input type="checkbox" id="sstNA"> N/A
+      <input type="text" id="sst" name="sst" style="width:calc(100% - 60px);margin-left:10px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    </div>
 
-  <!-- Submit -->
-  <button type="submit" style="width:100%;padding:14px;background:#4a2f00;color:#fff;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.3s;">
-    Submit
-  </button>
+    <label for="contact">Contact Number:</label>
+    <input type="text" id="contact" name="contact" required placeholder="e.g. 0123456789" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+
+    <!-- Address Section -->
+    <label>Address:</label>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:15px;">
+      <textarea id="address1" name="address1" required placeholder="Address Line 1" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
+      <textarea id="address2" name="address2" placeholder="Address Line 2" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
+      <textarea id="address3" name="address3" placeholder="Address Line 3" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
+      <div style="flex:1;min-width:120px;">
+        <label>Postcode:</label>
+        <input type="number" id="postcode" name="postcode" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      </div>
+      <div style="flex:2;min-width:200px;">
+        <label>City:</label>
+        <input type="text" id="city" name="city" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
+      <div style="flex:1;min-width:180px;">
+        <label>State:</label>
+        <select id="state" name="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+          <option value="">-- Select --</option>
+          <option value="Sarawak">Sarawak</option>
+          <option value="Sabah">Sabah</option>
+          <option value="Johor">Johor</option>
+          <option value="Kedah">Kedah</option>
+          <option value="Kelantan">Kelantan</option>
+          <option value="Melaka">Melaka</option>
+          <option value="Negeri Sembilan">Negeri Sembilan</option>
+          <option value="Pahang">Pahang</option>
+          <option value="Penang">Penang</option>
+          <option value="Perak">Perak</option>
+          <option value="Perlis">Perlis</option>
+          <option value="Selangor">Selangor</option>
+          <option value="Terengganu">Terengganu</option>
+          <option value="Kuala Lumpur">Kuala Lumpur</option>
+          <option value="Putrajaya">Putrajaya</option>
+          <option value="Labuan">Labuan</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:180px;">
+        <label>Country:</label>
+        <select id="country" name="country" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+          <option value="Malaysia">Malaysia</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Clarification -->
+    <div style="margin:15px 0;">
+      <label style="font-size:14px;color:#444;">
+        <input type="checkbox" id="confirm" required> I confirm that the above information is correct.
+      </label>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" style="width:100%;padding:14px;background:#4a2f00;color:#fff;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.3s;">
+      Submit
+    </button>
+
+  </form>
 </div>
 
 
@@ -160,18 +159,21 @@ window.onload = function() {
   const receiptParam = params.get("receipt");
   const totalParam = params.get("total");
 
-  const date = dateParam ? decodeURIComponent(dateParam) : null;
-  const receipt = receiptParam ? decodeURIComponent(receiptParam) : null;
-  const total = totalParam ? decodeURIComponent(totalParam) : null;
+  const date = dateParam ? decodeURIComponent(dateParam) : "";
+  const receipt = receiptParam ? decodeURIComponent(receiptParam) : "";
+  const total = totalParam ? decodeURIComponent(totalParam) : "";
 
-  // Autofill receipt details
-  if(date) document.getElementById("date").value = date.replace(/-/g, "/");
-  if(receipt) document.getElementById("invoice").value = receipt;
-  if(total) document.getElementById("amount").value = "RM " + total;
+  // Autofill receipt details (readonly, not disabled)
+  const dateEl = document.getElementById("date");
+  const invoiceEl = document.getElementById("invoice");
+  const amountEl = document.getElementById("amount");
+  if(dateEl) dateEl.value = date.replace(/-/g, "/");
+  if(invoiceEl) invoiceEl.value = receipt;
+  if(amountEl) amountEl.value = "RM " + total;
 
-  // Terminal auto-select
+  // Terminal auto-select (readonly)
   const terminalSelect = document.getElementById("terminal");
-  if(receipt){
+  if(terminalSelect && receipt){
     if(receipt.includes("T01")) terminalSelect.value = "T-01 (Pasar Counter 1)";
     else if(receipt.includes("T02")) terminalSelect.value = "T-02 (Pasar Counter 2)";
     else if(receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
@@ -180,28 +182,23 @@ window.onload = function() {
   // --------------------------
   // Receipt Date Validation
   // --------------------------
-  let formDisabled = false;
   const form = document.getElementById("eInvoiceForm");
+  let formDisabled = false;
 
   if(date){
     const [day, month, year] = date.split("-");
     const receiptDate = new Date(`${year}-${month}-${day}`);
-
-    // 3rd day of the next month
     const nextMonth = new Date(receiptDate);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
-
     const today = new Date();
 
     if(today > cutoffDate){
       formDisabled = true;
-      // Disable all form fields
       if(form){
         [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
       }
 
-      // Show special message box
       const msgBox = document.createElement("div");
       msgBox.innerText = "⚠️ Receipt Submitted after 3rd date on new month";
       msgBox.style.backgroundColor = "#ffdddd";
@@ -229,11 +226,20 @@ window.onload = function() {
     this.value = this.value.replace(/[^0-9+()-]/g,"");
   });
 
-  // --------------------------
-  // Name & Email formatting
-  // --------------------------
+  // Apply formatting
   formatUpperSingleSpace(document.getElementById("name"));
   formatLowerNoSpace(document.getElementById("email"));
+  formatUpperSingleSpace(document.getElementById("identityValue"));
+  formatUpperSingleSpace(document.getElementById("brn"));
+  formatNumberSymbolsOnly(document.getElementById("contact"));
+  ["address1","address2","address3"].forEach(id => formatUpperSingleSpace(document.getElementById(id)));
+  const city = document.getElementById("city");
+  city.addEventListener("input", function(){
+    this.value = this.value.toUpperCase().replace(/\s+/g," ").trimStart().replace(/[^A-Z\s]/g,"");
+  });
+  document.getElementById("postcode").addEventListener("input", function(){
+    this.value = this.value.replace(/\D/g,"");
+  });
 
   // --------------------------
   // TIN Section
@@ -241,15 +247,11 @@ window.onload = function() {
   const tinInput = document.getElementById("tinInput");
   const tinSection = document.getElementById("tinSection");
   const classification = document.getElementById("classification");
+  const tinCheckboxes = tinSection.querySelectorAll(".tinCheckbox");
 
-  // Disable textarea resize
   tinInput.style.resize = "none";
   formatUpperSingleSpace(tinInput);
 
-  // Select all checkboxes inside TIN section
-  const tinCheckboxes = tinSection.querySelectorAll(".tinCheckbox");
-
-  // Checkbox behavior
   tinCheckboxes.forEach(cb => {
     cb.addEventListener("change", function(){
       if(this.checked){
@@ -265,7 +267,6 @@ window.onload = function() {
     });
   });
 
-  // Show TIN section based on classification
   classification.addEventListener("change", function(){
     const identitySection = document.getElementById("identitySection");
     const brnSection = document.getElementById("brnSection");
@@ -293,45 +294,11 @@ window.onload = function() {
   });
 
   // --------------------------
-  // Identity / BRN / SST / Contact / Address
-  // --------------------------
-  formatUpperSingleSpace(document.getElementById("identityValue"));
-  formatUpperSingleSpace(document.getElementById("brn"));
-
-  const sst = document.getElementById("sst");
-  const sstNA = document.getElementById("sstNA");
-  formatUpperSingleSpace(sst);
-
-  sstNA.addEventListener("change", function(){
-    sst.disabled = this.checked;
-    if(this.checked) sst.value = "";
-  });
-
-  formatNumberSymbolsOnly(document.getElementById("contact"));
-
-  ["address1","address2","address3"].forEach(id => formatUpperSingleSpace(document.getElementById(id)));
-
-  document.getElementById("postcode").addEventListener("input", function(){
-    this.value = this.value.replace(/\D/g,"");
-  });
-
-  const city = document.getElementById("city");
-  city.addEventListener("input", function(){
-    this.value = this.value.toUpperCase().replace(/\s+/g," ").trimStart().replace(/[^A-Z\s]/g,"");
-  });
-
-  // --------------------------
   // State / Country logic
   // --------------------------
-  function formatStateInput(el){
-    el.addEventListener("input", function(){
-      this.value = this.value.toUpperCase().replace(/\s+/g," ").trimStart();
-    });
-  }
-
   const country = document.getElementById("country");
   country.addEventListener("change", function(){
-    let stateContainer = document.getElementById("state");
+    const stateContainer = document.getElementById("state");
     if(this.value==="Malaysia"){
       stateContainer.outerHTML = `
         <select id="state" style="width:100%;margin-bottom:10px;">
@@ -355,51 +322,7 @@ window.onload = function() {
         </select>`;
     } else {
       stateContainer.outerHTML = '<input type="text" id="state" style="width:100%;margin-bottom:10px;" placeholder="Enter State">';
-      formatStateInput(document.getElementById("state"));
     }
   });
-
-  if(document.getElementById("state") && document.getElementById("state").tagName==="INPUT"){
-    formatStateInput(document.getElementById("state"));
-  }
-
-  // --------------------------
-  // Form Submission to Google Sheets
-  // --------------------------
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-
-    if(formDisabled){
-      alert("Form cannot be submitted because the receipt is past the 3rd date of next month.");
-      return;
-    }
-
-    const formData = {};
-    [...form.querySelectorAll("input, select, textarea")].forEach(el => {
-      formData[el.id] = el.value;
-    });
-
-let missingFields = [];
-[...form.querySelectorAll("input[required], select[required], textarea[required]")].forEach(el => {
-  if(!el.value) missingFields.push(el.id);
-});
-if(missingFields.length > 0){
-  alert("Please fill all required fields.");
-  return;
-}
-
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec"; // <-- replace with your deployed Apps Script URL
-
-    fetch(SHEET_URL, {
-  method: "POST",
-  headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  body: new URLSearchParams(formData)
-})
-.then(res => res.json())
-.then(data => alert("Form submitted successfully!"))
-.catch(err => alert("Error submitting form: " + err));
-  });
-
 };
 </script>
-
