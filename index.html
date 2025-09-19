@@ -7,6 +7,9 @@
   <style>
     /* Make form container responsive */
     @media (max-width: 768px) {
+  #postcode, #city {
+    flex: 1 1 100% !important; /* take full width on small screens */
+  }
       div[style*="max-width:800px"] {
         max-width: 95% !important;
         margin: 20px auto !important;
