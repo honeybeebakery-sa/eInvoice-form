@@ -1,196 +1,169 @@
-<style>
-/* Make form container responsive */
-@media (max-width: 768px) {
-  div[style*="max-width:800px"] {
-    max-width: 95% !important;
-    margin: 20px auto !important;
-    padding: 20px !important;
-  }
-
-  /* Reduce font sizes for small screens */
-  h2 { font-size: 18px !important; }
-  h3 { font-size: 16px !important; }
-  input, select, textarea, button {
-    padding: 6px !important;
-    font-size: 14px !important;
-  }
-
-  button {
-    font-size: 14px !important;
-    padding: 12px !important;
-  }
-
-  /* Stack side-by-side fields vertically */
-  .flex, .flex-wrap {
-    flex-direction: column !important;
-  }
-
-  .flex > div {
-    min-width: 100% !important;
-  }
-
-  /* Fix SST input + N/A checkbox on mobile */
-  #sst {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-top: 5px !important;
-  }
-  #sstNA {
-    margin-top: 10px !important;
-  }
-}
-</style>
-
-<div style="max-width:800px;margin:40px auto;padding:30px;background:#f8f3e9;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1);font-family:Arial,sans-serif;line-height:1.6;color:#333;">
-
-  <form id="eInvoiceForm" action="https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec" method="POST">
-
-    <!-- Logo + Title -->
-    <div style="text-align:center;margin-bottom:25px;">
-      <img src="https://i.imgur.com/0lppOV5.png" alt="HONEYBITES Logo" style="max-width:150px;margin-bottom:15px;">
-      <h2 style="font-size:22px;color:#222;line-height:1.4;margin:0;">
-        HONEYBITES BAKERY SDN BHD
-      </h2>
-      <span style="font-size:18px;color:#444;">E-Invoice Request Application</span>
-    </div>
-
-    <!-- Receipt Info -->
-    <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">📄 Receipt Information</h3>
-
-    <label for="date">Date:</label>
-    <input type="text" id="date" name="date" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-    <label for="invoice">Invoice No.:</label>
-    <input type="text" id="invoice" name="invoice" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-    <label for="amount">Amount:</label>
-    <input type="text" id="amount" name="amount" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-    <label for="terminal">Cashier Terminal:</label>
-    <input type="text" id="terminal" name="terminal" readonly style="width:100%;margin-bottom:20px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-    <!-- Buyer Info -->
-    <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">🧾 Buyer Information</h3>
-
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required placeholder="FULL NAME" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required placeholder="example@mail.com" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-    <label for="classification">Classification:</label>
-    <select id="classification" name="classification" required style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-      <option value="">-- Select --</option>
-      <option value="Individual">Individual</option>
-      <option value="Business">Business</option>
-      <option value="Government">Government</option>
-    </select>
-
-    <!-- Dynamic Sections -->
-    <div id="tinSection" style="margin-bottom:15px;display:none;">
-      <label style="font-weight:600;">Tax Identification Number (TIN): <span style="color:red">*</span></label>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:5px;">
-        <label><input type="checkbox" class="tinCheckbox" value="EI00000000010"> EI00000000010 (Malaysian Citizen)</label>
-        <label><input type="checkbox" class="tinCheckbox" value="EI00000000020"> EI00000000020 (Non-Malaysian)</label>
-        <label><input type="checkbox" class="tinCheckbox" value="EI00000000040"> EI00000000040 (Government)</label>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes mobile responsive -->
+  <title>HONEYBITES E-Invoice Form</title>
+  <style>
+    /* Make form container responsive */
+    @media (max-width: 768px) {
+      div[style*="max-width:800px"] {
+        max-width: 95% !important;
+        margin: 20px auto !important;
+        padding: 20px !important;
+      }
+      h2 { font-size: 18px !important; }
+      h3 { font-size: 16px !important; }
+      input, select, textarea, button {
+        padding: 6px !important;
+        font-size: 14px !important;
+      }
+      button { font-size: 14px !important; padding: 12px !important; }
+      .flex, .flex-wrap { flex-direction: column !important; }
+      .flex > div { min-width: 100% !important; }
+      #sst { width: 100% !important; margin-left: 0 !important; margin-top: 5px !important; }
+      #sstNA { margin-top: 10px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:800px;margin:40px auto;padding:30px;background:#f8f3e9;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1);font-family:Arial,sans-serif;line-height:1.6;color:#333;">
+    <form id="eInvoiceForm" action="https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec" method="POST">
+      <!-- Logo + Title -->
+      <div style="text-align:center;margin-bottom:25px;">
+        <img src="https://i.imgur.com/0lppOV5.png" alt="HONEYBITES Logo" style="max-width:150px;margin-bottom:15px;">
+        <h2 style="font-size:22px;color:#222;line-height:1.4;margin:0;">HONEYBITES BAKERY SDN BHD</h2>
+        <span style="font-size:18px;color:#444;">E-Invoice Request Application</span>
       </div>
-      <textarea id="tinInput" name="tinInput" placeholder="Enter TIN manually" 
-                style="width:100%;margin-top:8px;padding:8px;border:1px solid #ccc;border-radius:6px; resize: none;"></textarea>
-    </div>
 
-    <div id="identitySection" style="margin-bottom:15px;display:none;">
-      <label for="identityType">Identity:</label>
-      <select id="identityType" name="identityType" style="width:100%;margin-bottom:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <!-- Receipt Info -->
+      <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">📄 Receipt Information</h3>
+      <label for="date">Date:</label>
+      <input type="text" id="date" name="date" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <label for="invoice">Invoice No.:</label>
+      <input type="text" id="invoice" name="invoice" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <label for="amount">Amount:</label>
+      <input type="text" id="amount" name="amount" readonly style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <label for="terminal">Cashier Terminal:</label>
+      <input type="text" id="terminal" name="terminal" readonly style="width:100%;margin-bottom:20px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+
+      <!-- Buyer Info -->
+      <h3 style="margin:20px 0 10px;color:#444;font-size:18px;">🧾 Buyer Information</h3>
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required placeholder="FULL NAME" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required placeholder="example@mail.com" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <label for="classification">Classification:</label>
+      <select id="classification" name="classification" required style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
         <option value="">-- Select --</option>
-        <option value="MyKad">MyKad</option>
-        <option value="MyPR">MyPR</option>
-        <option value="MyKAS">MyKAS</option>
-        <option value="Army">Army</option>
-        <option value="Passport">Passport</option>
+        <option value="Individual">Individual</option>
+        <option value="Business">Business</option>
+        <option value="Government">Government</option>
       </select>
-      <input type="text" id="identityValue" name="identityValue" placeholder="Identity No." style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-    </div>
 
-    <div id="brnSection" style="margin-bottom:15px;display:none;">
-      <label for="brn">Business Registration Number (BRN):</label>
-      <input type="text" id="brn" name="brn" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-    </div>
-
-    <div id="sstSection" style="margin-bottom:15px;display:none;">
-      <label for="sst">SST Registration Number:</label><br>
-      <input type="checkbox" id="sstNA"> N/A
-      <input type="text" id="sst" name="sst" style="width:calc(100% - 60px);margin-left:10px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-    </div>
-
-    <label for="contact">Contact Number:</label>
-    <input type="text" id="contact" name="contact" required placeholder="e.g. 0123456789" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
-
-    <!-- Address Section -->
-    <label>Address:</label>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:15px;">
-      <textarea id="address1" name="address1" required placeholder="Address Line 1" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
-      <textarea id="address2" name="address2" placeholder="Address Line 2" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
-      <textarea id="address3" name="address3" placeholder="Address Line 3" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
-    </div>
-
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
-      <div style="flex:1;min-width:120px;">
-        <label>Postcode:</label>
-        <input type="number" id="postcode" name="postcode" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <!-- Dynamic Sections -->
+      <div id="tinSection" style="margin-bottom:15px;display:none;">
+        <label style="font-weight:600;">Tax Identification Number (TIN): <span style="color:red">*</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:5px;">
+          <label><input type="checkbox" class="tinCheckbox" value="EI00000000010"> EI00000000010 (Malaysian Citizen)</label>
+          <label><input type="checkbox" class="tinCheckbox" value="EI00000000020"> EI00000000020 (Non-Malaysian)</label>
+          <label><input type="checkbox" class="tinCheckbox" value="EI00000000040"> EI00000000040 (Government)</label>
+        </div>
+        <textarea id="tinInput" name="tinInput" placeholder="Enter TIN manually" style="width:100%;margin-top:8px;padding:8px;border:1px solid #ccc;border-radius:6px; resize: none;"></textarea>
       </div>
-      <div style="flex:2;min-width:200px;">
-        <label>City:</label>
-        <input type="text" id="city" name="city" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-      </div>
-    </div>
 
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
-      <div style="flex:1;min-width:180px;">
-        <label>State:</label>
-        <select id="state" name="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      <div id="identitySection" style="margin-bottom:15px;display:none;">
+        <label for="identityType">Identity:</label>
+        <select id="identityType" name="identityType" style="width:100%;margin-bottom:8px;padding:8px;border:1px solid #ccc;border-radius:6px;">
           <option value="">-- Select --</option>
-          <option value="Sarawak">Sarawak</option>
-          <option value="Sabah">Sabah</option>
-          <option value="Johor">Johor</option>
-          <option value="Kedah">Kedah</option>
-          <option value="Kelantan">Kelantan</option>
-          <option value="Melaka">Melaka</option>
-          <option value="Negeri Sembilan">Negeri Sembilan</option>
-          <option value="Pahang">Pahang</option>
-          <option value="Penang">Penang</option>
-          <option value="Perak">Perak</option>
-          <option value="Perlis">Perlis</option>
-          <option value="Selangor">Selangor</option>
-          <option value="Terengganu">Terengganu</option>
-          <option value="Kuala Lumpur">Kuala Lumpur</option>
-          <option value="Putrajaya">Putrajaya</option>
-          <option value="Labuan">Labuan</option>
+          <option value="MyKad">MyKad</option>
+          <option value="MyPR">MyPR</option>
+          <option value="MyKAS">MyKAS</option>
+          <option value="Army">Army</option>
+          <option value="Passport">Passport</option>
         </select>
+        <input type="text" id="identityValue" name="identityValue" placeholder="Identity No." style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
       </div>
-      <div style="flex:1;min-width:180px;">
-        <label>Country:</label>
-        <select id="country" name="country" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-          <option value="Malaysia">Malaysia</option>
-          <option value="Other">Other</option>
-        </select>
+
+      <div id="brnSection" style="margin-bottom:15px;display:none;">
+        <label for="brn">Business Registration Number (BRN):</label>
+        <input type="text" id="brn" name="brn" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
       </div>
-    </div>
 
-    <!-- Clarification -->
-    <div style="margin:15px 0;">
-      <label style="font-size:14px;color:#444;">
-        <input type="checkbox" id="confirm" required> I confirm that the above information is correct.
-      </label>
-    </div>
+      <div id="sstSection" style="margin-bottom:15px;display:none;">
+        <label for="sst">SST Registration Number:</label><br>
+        <input type="checkbox" id="sstNA"> N/A
+        <input type="text" id="sst" name="sst" style="width:calc(100% - 60px);margin-left:10px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+      </div>
 
-    <!-- Submit -->
-    <button type="submit" style="width:100%;padding:14px;background:#4a2f00;color:#fff;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.3s;">
-      Submit
-    </button>
-    <div id="formStatus" style="margin-top:12px;font-weight:bold;color:#444;"></div>
+      <label for="contact">Contact Number:</label>
+      <input type="text" id="contact" name="contact" required placeholder="e.g. 0123456789" style="width:100%;margin-bottom:12px;padding:8px;border:1px solid #ccc;border-radius:6px;">
 
-  </form>
-</div>
+      <!-- Address Section -->
+      <label>Address:</label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:15px;">
+        <textarea id="address1" name="address1" required placeholder="Address Line 1" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
+        <textarea id="address2" name="address2" placeholder="Address Line 2" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
+        <textarea id="address3" name="address3" placeholder="Address Line 3" style="width:100%;height:50px;resize:none;padding:8px;border:1px solid #ccc;border-radius:6px;"></textarea>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
+        <div style="flex:1;min-width:120px;">
+          <label>Postcode:</label>
+          <input type="number" id="postcode" name="postcode" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </div>
+        <div style="flex:2;min-width:200px;">
+          <label>City:</label>
+          <input type="text" id="city" name="city" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
+        <div style="flex:1;min-width:180px;">
+          <label>State:</label>
+          <select id="state" name="state" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+            <option value="">-- Select --</option>
+            <option value="Sarawak">Sarawak</option>
+            <option value="Sabah">Sabah</option>
+            <option value="Johor">Johor</option>
+            <option value="Kedah">Kedah</option>
+            <option value="Kelantan">Kelantan</option>
+            <option value="Melaka">Melaka</option>
+            <option value="Negeri Sembilan">Negeri Sembilan</option>
+            <option value="Pahang">Pahang</option>
+            <option value="Penang">Penang</option>
+            <option value="Perak">Perak</option>
+            <option value="Perlis">Perlis</option>
+            <option value="Selangor">Selangor</option>
+            <option value="Terengganu">Terengganu</option>
+            <option value="Kuala Lumpur">Kuala Lumpur</option>
+            <option value="Putrajaya">Putrajaya</option>
+            <option value="Labuan">Labuan</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <label>Country:</label>
+          <select id="country" name="country" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+            <option value="Malaysia">Malaysia</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Clarification -->
+      <div style="margin:15px 0;">
+        <label style="font-size:14px;color:#444;">
+          <input type="checkbox" id="confirm" required> I confirm that the above information is correct.
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" style="width:100%;padding:14px;background:#4a2f00;color:#fff;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:16px;transition:0.3s;">
+        Submit
+      </button>
+      <div id="formStatus" style="margin-top:12px;font-weight:bold;color:#444;"></div>
+    </form>
+  </div>
 
 <script>
 window.onload = function() {
@@ -452,6 +425,9 @@ if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.check
   });
 };
 </script>
+</body>
+</html>
+
 
 
 
