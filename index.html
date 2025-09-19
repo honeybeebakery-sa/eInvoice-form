@@ -333,7 +333,7 @@ tinInput.readOnly = false; // allow typing initially
     const stateContainer = document.getElementById("state");
     if(this.value==="Malaysia"){
       stateContainer.outerHTML = `
-        <select id="state" style="width:100%;margin-bottom:10px;">
+        <select id="state" name="state" style="width:100%;margin-bottom:10px;" required>
           <option value="">-- Select --</option>
           <option value="Sarawak">Sarawak</option>
           <option value="Sabah">Sabah</option>
@@ -353,7 +353,10 @@ tinInput.readOnly = false; // allow typing initially
           <option value="Labuan">Labuan</option>
         </select>`;
     } else {
-      stateContainer.outerHTML = '<input type="text" id="state" style="width:100%;margin-bottom:10px;" placeholder="Enter State">';
+      stateContainer.outerHTML = `
+      <input type="text" id="state" name="state"
+        style="width:100%;margin-bottom:10px;"
+        placeholder="Enter State" required>`;
     }
   });
 
@@ -429,6 +432,7 @@ if(sstSection && sstSection.style.display !== "none" && sstField && !sstNA.check
 </script>
 </body>
 </html>
+
 
 
 
