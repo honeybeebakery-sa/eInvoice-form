@@ -395,37 +395,48 @@ window.onload = function() {
     else if(receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
   }
 
-  // --------------------------
-  // Receipt Date Validation
-  // --------------------------
-  const form = document.getElementById("eInvoiceForm");
-  let formDisabled = false;
+// --------------------------
+// Receipt Date Validation
+// --------------------------
+const form = document.getElementById("eInvoiceForm");
+let formDisabled = false;
 
-  if(date){
-    const [day, month, year] = date.split("-");
-    const receiptDate = new Date(`${year}-${month}-${day}`);
-    const nextMonth = new Date(receiptDate);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
-    const today = new Date();
+if(dateEl && dateEl.value){
+  // URL provides YYYY-MM-DD, split by "-" even if display shows "/"
+  const parts = dateEl.value.includes("-") ? dateEl.value.split("-") : dateEl.value.split("/");
+  const [year, month, day] = parts;
+  const receiptDate = new Date(`${year}-${month}-${day}`);
 
-    if(today > cutoffDate){
-      formDisabled = true;
-      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+  // Cutoff = 3rd of next month
+  const nextMonth = new Date(receiptDate);
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
 
-      const msgBox = document.createElement("div");
-      msgBox.innerText = "⚠️ Receipt Submitted after 3rd date on new month";
-      msgBox.style.backgroundColor = "#ffdddd";
-      msgBox.style.color = "#d8000c";
-      msgBox.style.padding = "12px";
-      msgBox.style.border = "1px solid #d8000c";
-      msgBox.style.borderRadius = "8px";
-      msgBox.style.marginBottom = "15px";
-      msgBox.style.fontWeight = "bold";
-      msgBox.style.textAlign = "center";
-      form.parentNode.insertBefore(msgBox, form);
-    }
+  const today = new Date();
+
+  if(today > cutoffDate){
+    formDisabled = true;
+
+    // Disable all form elements
+    [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+
+    // Show warning message
+    const msgBox = document.createElement("div");
+    msgBox.innerText = "⚠️ Receipt submitted after 3rd of new month. Form is disabled.";
+    msgBox.style.backgroundColor = "#ffdddd";
+    msgBox.style.color = "#d8000c";
+    msgBox.style.padding = "12px";
+    msgBox.style.border = "1px solid #d8000c";
+    msgBox.style.borderRadius = "8px";
+    msgBox.style.marginBottom = "15px";
+    msgBox.style.fontWeight = "bold";
+    msgBox.style.textAlign = "center";
+    form.parentNode.insertBefore(msgBox, form);
   }
+
+  // Format input to YYYY/MM/DD for display only
+  dateEl.value = `${year}/${month}/${day}`;
+}
 
   // --------------------------
   // Input formatting helpers
@@ -668,3 +679,4 @@ if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) m
 </script>
 </body>
 </html>
+
