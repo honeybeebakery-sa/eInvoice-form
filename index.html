@@ -396,44 +396,36 @@ window.onload = function() {
   }
 
   // --------------------------
-// Receipt Date Validation (refer to form input)
-// --------------------------
-const form = document.getElementById("eInvoiceForm");
-let formDisabled = false;
+  // Receipt Date Validation
+  // --------------------------
+  const form = document.getElementById("eInvoiceForm");
+  let formDisabled = false;
 
-const dateEl = document.getElementById("date");
-if(dateEl && dateEl.value.trim() !== ""){
-  // Convert DD/MM/YYYY -> [day, month, year]
-  const [day, month, year] = dateEl.value.split("/");
-  const receiptDate = new Date(`${year}-${month}-${day}`);
-  
-  const nextMonth = new Date(receiptDate);
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
-  const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
-  const today = new Date();
+  if(date){
+    const [day, month, year] = date.split("-");
+    const receiptDate = new Date(`${year}-${month}-${day}`);
+    const nextMonth = new Date(receiptDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
+    const today = new Date();
 
-  if(today > cutoffDate){
-  formDisabled = true;
-  // disable all except autofill fields
-  [...form.querySelectorAll("input, select, textarea, button")].forEach(el => {
-    if(!["date","invoice","amount","terminal"].includes(el.id)){
-      el.disabled = true;
+    if(today > cutoffDate){
+      formDisabled = true;
+      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+
+      const msgBox = document.createElement("div");
+      msgBox.innerText = "⚠️ Receipt Submitted after 3rd date on new month";
+      msgBox.style.backgroundColor = "#ffdddd";
+      msgBox.style.color = "#d8000c";
+      msgBox.style.padding = "12px";
+      msgBox.style.border = "1px solid #d8000c";
+      msgBox.style.borderRadius = "8px";
+      msgBox.style.marginBottom = "15px";
+      msgBox.style.fontWeight = "bold";
+      msgBox.style.textAlign = "center";
+      form.parentNode.insertBefore(msgBox, form);
     }
-  });
-
-    const msgBox = document.createElement("div");
-    msgBox.innerText = "⚠️ Receipt Submitted after 3rd date on new month";
-    msgBox.style.backgroundColor = "#ffdddd";
-    msgBox.style.color = "#d8000c";
-    msgBox.style.padding = "12px";
-    msgBox.style.border = "1px solid #d8000c";
-    msgBox.style.borderRadius = "8px";
-    msgBox.style.marginBottom = "15px";
-    msgBox.style.fontWeight = "bold";
-    msgBox.style.textAlign = "center";
-    form.parentNode.insertBefore(msgBox, form);
   }
-}
 
   // --------------------------
   // Input formatting helpers
@@ -676,7 +668,3 @@ if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) m
 </script>
 </body>
 </html>
-
-
-
-
