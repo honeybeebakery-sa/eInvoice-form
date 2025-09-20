@@ -413,8 +413,13 @@ if(dateEl && dateEl.value.trim() !== ""){
   const today = new Date();
 
   if(today > cutoffDate){
-    formDisabled = true;
-    [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+  formDisabled = true;
+  // disable all except autofill fields
+  [...form.querySelectorAll("input, select, textarea, button")].forEach(el => {
+    if(!["date","invoice","amount","terminal"].includes(el.id)){
+      el.disabled = true;
+    }
+  });
 
     const msgBox = document.createElement("div");
     msgBox.innerText = "⚠️ Receipt Submitted after 3rd date on new month";
@@ -671,6 +676,7 @@ if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) m
 </script>
 </body>
 </html>
+
 
 
 
