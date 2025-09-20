@@ -402,15 +402,16 @@ const form = document.getElementById("eInvoiceForm");
 let formDisabled = false;
 
 if(dateEl && dateEl.value){
-  // URL provides YYYY-MM-DD, split by "-" even if display shows "/"
+  // URL provides YYYY-MM-DD, split by "-" or "/"
   const parts = dateEl.value.includes("-") ? dateEl.value.split("-") : dateEl.value.split("/");
   const [year, month, day] = parts;
   const receiptDate = new Date(`${year}-${month}-${day}`);
 
+  // Move to first of next month to avoid end-of-month rollover issues
+  const nextMonthFirst = new Date(receiptDate.getFullYear(), receiptDate.getMonth() + 1, 1);
+
   // Cutoff = 3rd of next month
-  const nextMonth = new Date(receiptDate);
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
-  const cutoffDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 3);
+  const cutoffDate = new Date(nextMonthFirst.getFullYear(), nextMonthFirst.getMonth(), 3);
 
   const today = new Date();
 
@@ -679,4 +680,5 @@ if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) m
 </script>
 </body>
 </html>
+
 
