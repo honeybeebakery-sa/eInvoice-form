@@ -379,6 +379,10 @@ window.onload = function() {
   const receipt = receiptParam ? decodeURIComponent(receiptParam) : "";
   const total = totalParam ? decodeURIComponent(totalParam) : "";
 
+  // Define form + global disable flag
+  const form = document.getElementById("eInvoiceForm");
+  let formDisabled = false;
+
   // Autofill receipt details (readonly)
   const dateEl = document.getElementById("date");
   const invoiceEl = document.getElementById("invoice");
@@ -395,51 +399,51 @@ window.onload = function() {
     else if(receipt.includes("T04")) terminalSelect.value = "T-01 (Lian Yi Counter)";
   }
 
-// --------------------------
-// Duplicate Receipt Check (run AFTER autofill)
-// --------------------------
-if (invoiceEl && invoiceEl.value) {
-  console.log("Checking receipt:", invoiceEl.value); // debug log
+  // --------------------------
+  // Duplicate Receipt Check (run AFTER autofill)
+  // --------------------------
+  if (invoiceEl && invoiceEl.value) {
+    console.log("Checking receipt:", invoiceEl.value); // debug log
 
-  fetch("https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec")
-    .then(res => res.json())
-    .then(existingReceipts => {
-      console.log("Receipts from sheet:", existingReceipts); // debug log
+    fetch("https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec")
+      .then(res => res.json())
+      .then(existingReceipts => {
+        console.log("Receipts from sheet:", existingReceipts); // debug log
 
-      const normalizedReceipts = existingReceipts.map(r => r.toString().trim().toUpperCase());
-      if (normalizedReceipts.includes(invoiceEl.value.trim().toUpperCase())) {
-        // Disable form
-        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
-        formDisabled = true; // <-- mark disabled globally
+        const normalizedReceipts = existingReceipts.map(r => r.toString().trim().toUpperCase());
+        if (normalizedReceipts.includes(invoiceEl.value.trim().toUpperCase())) {
+          // Disable form
+          [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+          formDisabled = true; // <-- mark disabled globally
 
-        // Show message
-        const msgBox = document.createElement("div");
-        msgBox.innerText = "✅ The Receipt already submitted for E-Invoice.";
-        msgBox.style.backgroundColor = "#ddffdd";
-        msgBox.style.color = "#006400";
-        msgBox.style.padding = "12px";
-        msgBox.style.border = "1px solid #006400";
-        msgBox.style.borderRadius = "8px";
-        msgBox.style.marginBottom = "15px";
-        msgBox.style.fontWeight = "bold";
-        msgBox.style.textAlign = "center";
-        form.parentNode.insertBefore(msgBox, form);
-      } else {
-        runDateValidation(); // only run date check if NOT duplicate
-      }
-    })
-    .catch(err => console.error("Error checking receipts:", err));
-} else {
-  runDateValidation(); // no invoice, still check date
-}
+          // Show message
+          const msgBox = document.createElement("div");
+          msgBox.innerText = "✅ The Receipt already submitted for E-Invoice.";
+          msgBox.style.backgroundColor = "#ddffdd";
+          msgBox.style.color = "#006400";
+          msgBox.style.padding = "12px";
+          msgBox.style.border = "1px solid #006400";
+          msgBox.style.borderRadius = "8px";
+          msgBox.style.marginBottom = "15px";
+          msgBox.style.fontWeight = "bold";
+          msgBox.style.textAlign = "center";
+          form.parentNode.insertBefore(msgBox, form);
+        } else {
+          runDateValidation(); // only run date check if NOT duplicate
+        }
+      })
+      .catch(err => console.error("Error checking receipts:", err));
+  } else {
+    runDateValidation(); // no invoice, still check date
+  }
 
-// --------------------------
-// Receipt Date Validation (wrapped in function)
-// --------------------------
-function runDateValidation() {
-  if (formDisabled) return; // skip if already disabled earlier
-
-  if(dateEl && dateEl.value){
+  // --------------------------
+  // Receipt Date Validation (wrapped in function)
+  // --------------------------
+  function runDateValidation() {
+    if (formDisabled) return; // skip if already disabled earlier
+    
+    if(dateEl && dateEl.value){
     // URL provides YYYY-MM-DD, split by "-" or "/"
     const parts = dateEl.value.includes("-") ? dateEl.value.split("-") : dateEl.value.split("/");
     const [year, month, day] = parts;
@@ -719,6 +723,7 @@ if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) m
 </script>
 </body>
 </html>
+
 
 
 
