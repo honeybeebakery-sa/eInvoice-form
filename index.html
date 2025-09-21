@@ -396,47 +396,86 @@ window.onload = function() {
   }
 
 // --------------------------
-// Receipt Date Validation
+// Duplicate Receipt Check (run AFTER autofill)
 // --------------------------
-const form = document.getElementById("eInvoiceForm");
-let formDisabled = false;
+if (invoiceEl && invoiceEl.value) {
+  console.log("Checking receipt:", invoiceEl.value); // debug log
 
-if(dateEl && dateEl.value){
-  // URL provides YYYY-MM-DD, split by "-" or "/"
-  const parts = dateEl.value.includes("-") ? dateEl.value.split("-") : dateEl.value.split("/");
-  const [year, month, day] = parts;
-  const receiptDate = new Date(`${year}-${month}-${day}`);
+  fetch("https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec")
+    .then(res => res.json())
+    .then(existingReceipts => {
+      console.log("Receipts from sheet:", existingReceipts); // debug log
 
-  // Move to first of next month to avoid end-of-month rollover issues
-  const nextMonthFirst = new Date(receiptDate.getFullYear(), receiptDate.getMonth() + 1, 1);
+      const normalizedReceipts = existingReceipts.map(r => r.toString().trim().toUpperCase());
+      if (normalizedReceipts.includes(invoiceEl.value.trim().toUpperCase())) {
+        // Disable form
+        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+        formDisabled = true; // <-- mark disabled globally
 
-  // Cutoff = 3rd of next month
-  const cutoffDate = new Date(nextMonthFirst.getFullYear(), nextMonthFirst.getMonth(), 3);
+        // Show message
+        const msgBox = document.createElement("div");
+        msgBox.innerText = "✅ The Receipt already submitted for E-Invoice.";
+        msgBox.style.backgroundColor = "#ddffdd";
+        msgBox.style.color = "#006400";
+        msgBox.style.padding = "12px";
+        msgBox.style.border = "1px solid #006400";
+        msgBox.style.borderRadius = "8px";
+        msgBox.style.marginBottom = "15px";
+        msgBox.style.fontWeight = "bold";
+        msgBox.style.textAlign = "center";
+        form.parentNode.insertBefore(msgBox, form);
+      } else {
+        runDateValidation(); // only run date check if NOT duplicate
+      }
+    })
+    .catch(err => console.error("Error checking receipts:", err));
+} else {
+  runDateValidation(); // no invoice, still check date
+}
 
-  const today = new Date();
+// --------------------------
+// Receipt Date Validation (wrapped in function)
+// --------------------------
+function runDateValidation() {
+  if (formDisabled) return; // skip if already disabled earlier
 
-  if(today > cutoffDate){
-    formDisabled = true;
+  if(dateEl && dateEl.value){
+    // URL provides YYYY-MM-DD, split by "-" or "/"
+    const parts = dateEl.value.includes("-") ? dateEl.value.split("-") : dateEl.value.split("/");
+    const [year, month, day] = parts;
+    const receiptDate = new Date(`${year}-${month}-${day}`);
 
-    // Disable all form elements
-    [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+    // Move to first of next month to avoid end-of-month rollover issues
+    const nextMonthFirst = new Date(receiptDate.getFullYear(), receiptDate.getMonth() + 1, 1);
 
-    // Show warning message
-    const msgBox = document.createElement("div");
-    msgBox.innerText = "⚠️ Receipt submitted after 3rd of new month. Form is disabled.";
-    msgBox.style.backgroundColor = "#ffdddd";
-    msgBox.style.color = "#d8000c";
-    msgBox.style.padding = "12px";
-    msgBox.style.border = "1px solid #d8000c";
-    msgBox.style.borderRadius = "8px";
-    msgBox.style.marginBottom = "15px";
-    msgBox.style.fontWeight = "bold";
-    msgBox.style.textAlign = "center";
-    form.parentNode.insertBefore(msgBox, form);
+    // Cutoff = 3rd of next month
+    const cutoffDate = new Date(nextMonthFirst.getFullYear(), nextMonthFirst.getMonth(), 3);
+
+    const today = new Date();
+
+    if(today > cutoffDate){
+      formDisabled = true;
+
+      // Disable all form elements
+      [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+
+      // Show warning message
+      const msgBox = document.createElement("div");
+      msgBox.innerText = "⚠️ Receipt submitted after 3rd of new month. Form is disabled.";
+      msgBox.style.backgroundColor = "#ffdddd";
+      msgBox.style.color = "#d8000c";
+      msgBox.style.padding = "12px";
+      msgBox.style.border = "1px solid #d8000c";
+      msgBox.style.borderRadius = "8px";
+      msgBox.style.marginBottom = "15px";
+      msgBox.style.fontWeight = "bold";
+      msgBox.style.textAlign = "center";
+      form.parentNode.insertBefore(msgBox, form);
+    }
+
+    // Format input to YYYY/MM/DD for display only
+    dateEl.value = `${year}/${month}/${day}`;
   }
-
-  // Format input to YYYY/MM/DD for display only
-  dateEl.value = `${year}/${month}/${day}`;
 }
 
   // --------------------------
@@ -573,39 +612,6 @@ tinInput.readOnly = false; // allow typing initially
   });
 
   // --------------------------
-  // Duplicate Receipt Check (run AFTER autofill)
-  // --------------------------
-  if (invoiceEl && invoiceEl.value) {
-    console.log("Checking receipt:", invoiceEl.value); // debug log
-
-    fetch("https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec")
-      .then(res => res.json())
-      .then(existingReceipts => {
-        console.log("Receipts from sheet:", existingReceipts); // debug log
-
-        const normalizedReceipts = existingReceipts.map(r => r.toString().trim().toUpperCase());
-        if (normalizedReceipts.includes(invoiceEl.value.trim().toUpperCase())) {
-          // Disable form
-          [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
-
-          // Show message
-          const msgBox = document.createElement("div");
-          msgBox.innerText = "✅ The Receipt already submitted for E-Invoice.";
-          msgBox.style.backgroundColor = "#ddffdd";
-          msgBox.style.color = "#006400";
-          msgBox.style.padding = "12px";
-          msgBox.style.border = "1px solid #006400";
-          msgBox.style.borderRadius = "8px";
-          msgBox.style.marginBottom = "15px";
-          msgBox.style.fontWeight = "bold";
-          msgBox.style.textAlign = "center";
-          form.parentNode.insertBefore(msgBox, form);
-        }
-      })
-      .catch(err => console.error("Error checking receipts:", err));
-  }
-
-  // --------------------------
   // Form submission
   // --------------------------
   const formStatus = document.getElementById("formStatus");
@@ -713,6 +719,7 @@ if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) m
 </script>
 </body>
 </html>
+
 
 
 
