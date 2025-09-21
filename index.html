@@ -572,6 +572,32 @@ tinInput.readOnly = false; // allow typing initially
     }
   });
 
+// After autofill
+if (invoiceEl && invoiceEl.value) {
+  fetch("https://script.google.com/macros/s/AKfycbzZ62GZSymHf0TjojqEZryQy8FECnoKN9l3vEVTFDVWg0B6ga1natUnynuc5LDxdWEpdQ/exec") // Google Apps Script Web App returning JSON
+    .then(res => res.json())
+    .then(existingReceipts => {
+      if (existingReceipts.includes(invoiceEl.value)) {
+        // Disable form
+        [...form.querySelectorAll("input, select, textarea, button")].forEach(el => el.disabled = true);
+
+        // Show message
+        const msgBox = document.createElement("div");
+        msgBox.innerText = "⚠️ The Receipt already submitted for E-Invoice.";
+        msgBox.style.backgroundColor = "#ffdddd";
+        msgBox.style.color = "#d8000c";
+        msgBox.style.padding = "12px";
+        msgBox.style.border = "1px solid #d8000c";
+        msgBox.style.borderRadius = "8px";
+        msgBox.style.marginBottom = "15px";
+        msgBox.style.fontWeight = "bold";
+        msgBox.style.textAlign = "center";
+        form.parentNode.insertBefore(msgBox, form);
+      }
+    })
+    .catch(err => console.error("Error checking receipts:", err));
+}
+
   // --------------------------
   // Form submission
   // --------------------------
@@ -680,5 +706,6 @@ if(terminalEl && terminalEl.offsetParent !== null && !terminalEl.value.trim()) m
 </script>
 </body>
 </html>
+
 
 
